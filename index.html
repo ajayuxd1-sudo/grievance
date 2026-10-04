@@ -1,0 +1,2259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TMC JanSeva — Interactive CGMS Demo</title>
+<style>
+:root{
+  --ink:#172033;--muted:#687386;--line:#e5e9f0;--bg:#f5f7fb;--card:#fff;
+  --accent:#7c3aed;--accent2:#4f46e5;--success:#15966a;--warn:#d97706;--danger:#dc3545;
+  --shadow:0 12px 32px rgba(22,32,51,.08);--radius:18px;
+}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+.demo-bar{position:sticky;top:0;z-index:100;background:#111827;color:#fff;padding:12px 22px;box-shadow:0 4px 18px #0002}
+.demo-inner{max-width:1440px;margin:auto;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.brand-demo{font-weight:750;letter-spacing:.2px;white-space:nowrap}.brand-demo span{color:#a78bfa}
+.steps{display:flex;gap:5px;flex:1;min-width:300px}
+.step{border:1px solid #ffffff22;background:#ffffff0c;color:#cbd5e1;border-radius:999px;padding:7px 11px;font-size:12px;white-space:nowrap}
+.step.active{background:#7c3aed;color:#fff;border-color:#8b5cf6}.step.done{background:#ffffff15;color:#e2e8f0}
+.demo-actions{display:flex;gap:7px}.demo-actions button{border:1px solid #ffffff2b;background:#fff;color:#111827;border-radius:10px;padding:8px 12px;font-weight:650}
+.demo-actions .reset{background:transparent;color:#fff}
+.app{max-width:1440px;margin:0 auto;min-height:calc(100vh - 65px)}
+.topbar{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 28px}
+.logo{display:flex;gap:10px;align-items:center;font-weight:800;font-size:18px}.logo-mark{width:34px;height:34px;border-radius:11px;background:linear-gradient(135deg,#7c3aed,#4f46e5);display:grid;place-items:center;color:#fff}
+.top-actions{display:flex;align-items:center;gap:10px}.avatar{width:34px;height:34px;border-radius:50%;background:#ede9fe;display:grid;place-items:center;color:#6d28d9;font-weight:750}
+.layout{display:grid;grid-template-columns:230px 1fr;min-height:calc(100vh - 137px)}
+.sidebar{background:#fff;border-right:1px solid var(--line);padding:20px 14px}.nav-title{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#9aa3b2;margin:12px 10px 8px}
+.nav{padding:10px 12px;border-radius:11px;color:#566174;margin:3px 0;display:flex;gap:10px;align-items:center}.nav.active{background:#f0ebff;color:#6d28d9;font-weight:700}.content{padding:28px;max-width:1180px;width:100%;margin:auto}
+.page-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:22px}.eyebrow{font-size:12px;color:#7c3aed;font-weight:750;text-transform:uppercase;letter-spacing:.8px}.title{font-size:27px;font-weight:800;margin:5px 0}.subtitle{color:var(--muted);max-width:720px}.btn{border:1px solid var(--line);background:#fff;border-radius:11px;padding:10px 14px;font-weight:700;color:#364152}.btn.primary{background:#6d28d9;border-color:#6d28d9;color:#fff}.btn.success{background:#e8f8f1;border-color:#bdebd8;color:#08734f}.btn.danger{background:#fff1f2;border-color:#fecdd3;color:#be123c}
+.grid{display:grid;gap:16px}.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}.card h3{margin:0 0 10px;font-size:15px}.metric .label{color:var(--muted);font-size:12px}.metric .num{font-size:28px;font-weight:800;margin:5px 0}.metric .delta{font-size:11px;color:var(--success);font-weight:700}
+.status{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:750}.status.high{background:#fff0f1;color:#c3273b}.status.open{background:#fff7e8;color:#a45c00}.status.progress{background:#eeeaff;color:#6242c5}.status.done{background:#e9f8f1;color:#08734f}
+.case-row{display:grid;grid-template-columns:1.3fr 1fr .7fr .7fr auto;gap:15px;align-items:center;padding:15px 0;border-top:1px solid var(--line)}.case-row:first-child{border-top:0}.small{font-size:12px;color:var(--muted)}.strong{font-weight:750}
+.map{height:260px;border-radius:15px;background:
+radial-gradient(circle at 28% 62%,#7c3aed55 0 5px,transparent 6px),
+radial-gradient(circle at 52% 39%,#ef444455 0 5px,transparent 6px),
+radial-gradient(circle at 73% 65%,#7c3aed55 0 5px,transparent 6px),
+linear-gradient(25deg,transparent 47%,#d8dde7 48%,#d8dde7 49%,transparent 50%),
+linear-gradient(155deg,transparent 42%,#e3e7ee 43%,#e3e7ee 44%,transparent 45%),#eef1f5;position:relative;overflow:hidden}.map:after{content:"THANE MUNICIPAL AREA";position:absolute;left:20px;top:18px;color:#9aa3b2;font-size:11px;letter-spacing:1.2px;font-weight:800}.pin{position:absolute;width:12px;height:12px;border-radius:50%;background:#7c3aed;border:3px solid #fff;box-shadow:0 2px 8px #0003}.p1{left:28%;top:60%}.p2{left:52%;top:37%;background:#ef4444}.p3{left:73%;top:63%}
+.timeline{position:relative;padding-left:25px}.timeline:before{content:"";position:absolute;left:6px;top:5px;bottom:5px;width:2px;background:#e5e7eb}.event{position:relative;margin:0 0 18px}.event:before{content:"";position:absolute;left:-23px;top:3px;width:8px;height:8px;border-radius:50%;background:#7c3aed;box-shadow:0 0 0 4px #ede9fe}.event .time{font-size:11px;color:#8a93a3}.event .txt{font-weight:650;margin-top:3px}.event .by{font-size:11px;color:#8992a2;margin-top:2px}
+.ai-box{background:linear-gradient(135deg,#f7f2ff,#f5f7ff);border:1px solid #e5dcff;border-radius:15px;padding:15px}.ai-title{display:flex;align-items:center;gap:8px;color:#6334c8;font-weight:800}.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.chip{background:#fff;border:1px solid #ddd5f8;border-radius:8px;padding:6px 9px;font-size:11px;color:#5b4b8a}
+.bar{height:8px;background:#edf0f4;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#7c3aed,#4f46e5);border-radius:99px}
+.table{width:100%;border-collapse:collapse}.table th,.table td{text-align:left;padding:12px;border-bottom:1px solid var(--line);font-size:12px}.table th{color:#7b8493;font-weight:700}
+.alert{border:1px solid #fed7aa;background:#fff7ed;color:#9a4e08;padding:12px 14px;border-radius:12px}.success-box{border:1px solid #b7ead4;background:#eefbf5;color:#08734f;padding:13px;border-radius:12px}
+.mobile-shell{max-width:430px;margin:18px auto;background:#111827;border-radius:35px;padding:9px;box-shadow:0 25px 55px #17203330}.phone{background:#f7f8fb;border-radius:27px;min-height:760px;overflow:hidden;position:relative}.mobile-head{background:#fff;padding:18px 18px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.mobile-body{padding:17px}.mobile-bottom{position:absolute;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:12px 6px}.mobile-bottom div{text-align:center;font-size:10px;color:#8a93a3}.mobile-bottom .sel{color:#6d28d9;font-weight:750}.hero-card{background:linear-gradient(145deg,#6d28d9,#4f46e5);color:#fff;border-radius:20px;padding:20px;box-shadow:0 14px 30px #5b21b640}.hero-card .tiny{color:#ddd6fe;font-size:11px}.hero-card .big{font-size:23px;font-weight:800;margin:5px 0 12px}.mobile-action{width:100%;padding:13px;border:0;border-radius:12px;background:#6d28d9;color:#fff;font-weight:800}.upload{border:1.5px dashed #cbd2dd;background:#fff;border-radius:15px;padding:18px;text-align:center;color:#737d8d}.photo{height:150px;border-radius:14px;background:linear-gradient(145deg,#6b7280,#cbd5e1 50%,#475569);position:relative;overflow:hidden}.photo:after{content:"FIELD PHOTO";position:absolute;right:10px;bottom:9px;color:#fff;font-size:10px;font-weight:800;letter-spacing:1px}.phone .card{box-shadow:none}
+select{border:1px solid #dfe4ec;background:#fff;border-radius:10px;padding:9px 11px}
+.toast{position:fixed;right:20px;bottom:20px;background:#111827;color:#fff;border-radius:12px;padding:12px 15px;box-shadow:0 12px 35px #0003;z-index:200;display:none}.toast.show{display:block}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{display:none}.content{padding:18px}.g4{grid-template-columns:repeat(2,1fr)}.g3,.g2{grid-template-columns:1fr}.topbar{padding:0 17px}.steps{order:3;width:100%;overflow:auto}.demo-inner{gap:8px}.case-row{grid-template-columns:1fr 1fr}.mobile-shell{margin:0 auto}.demo-bar{position:relative}}
+@media(max-width:600px){.g4{grid-template-columns:1fr 1fr}.title{font-size:23px}.top-actions .hide-sm{display:none}.demo-actions{width:100%}.demo-actions button{flex:1}.step{font-size:10px}.mobile-shell{padding:5px;border-radius:29px}.phone{border-radius:25px}}
+
+/* Executive separation + accessibility contrast pass */
+.demo-guide-kicker,.demo-guide-hint,.small{color:#475467 !important}
+.nav{color:#344054}.nav-title{color:#667085}.subtitle{color:#475467}.eyebrow{color:#5b21b6}
+.table th{color:#344054}.table td{color:#172033}.metric .label{color:#475467}.event .time,.event .by{color:#475467}.chart-note{color:#475467}
+.chip{color:#47337a}.case-stage{color:#667085}.case-stage.current{color:#4338ca}.case-stage.done{color:#08734f}
+.dept-chart-card{min-height:340px}.section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:15px}.section-head h3{margin-bottom:4px}.chart-note{font-size:11px;font-weight:700;white-space:nowrap}.dept-bar-row{margin:13px 0}.dept-bar-label{display:flex;justify-content:space-between;gap:12px;font-size:12px;margin-bottom:6px}.dept-bar-label span{font-weight:800}.sla-bar i{background:linear-gradient(90deg,#16a36f,#0f766e)}.dept-table th,.dept-table td{vertical-align:middle}.risk-number{color:#b42318;font-weight:800}.normal-number{color:#08734f;font-weight:800}.trend{color:#08734f;font-weight:800}.trend.down{color:#b42318}.health-cell{display:flex;align-items:center;gap:8px;min-width:90px}.health-track{height:7px;background:#e4e7ec;border-radius:99px;overflow:hidden;flex:1}.health-track i{display:block;height:100%;background:#0f766e;border-radius:99px}.attention-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-top:1px solid var(--line)}.attention-item:first-of-type{border-top:0}.table-wrap{overflow:auto}
+@media(max-width:900px){.dept-chart-card{min-height:0}.section-head{flex-direction:column}.chart-note{white-space:normal}}
+</style>
+
+<style id="resolution-confirm-contrast">
+.resolution-modal h2{color:#101828}
+.resolution-modal .small{color:#344054}
+.resolution-modal label{color:#172033;font-size:13px;line-height:1.35}
+.resolution-modal input[type="checkbox"]{width:17px;height:17px;accent-color:#5b21b6;flex:0 0 auto;margin-top:2px}
+.resolution-modal .alert{color:#7a2e0e;background:#fff7ed;border-color:#fed7aa}
+.resolution-modal .alert .small{color:#7a2e0e}
+</style>
+</head>
+<body>
+<div class="demo-bar">
+  <div class="demo-inner">
+    <div class="brand-demo">CGMS <span>MAHARASHTRA</span> · DEMO</div>
+    <div class="steps" id="steps"></div>
+    <div class="demo-actions">
+      <button onclick="nextPersona()">Next persona →</button>
+      <button class="reset" onclick="resetDemo()">Reset</button>
+    </div>
+  </div>
+</div>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const personas=[
+ {id:"citizen",label:"Citizen",icon:"📱"},
+ {id:"control",label:"Control Room",icon:"🖥️"},
+ {id:"officer",label:"Department Officer",icon:"🖥️"},
+ {id:"field",label:"Ground Team",icon:"📱"},
+ {id:"resolution",label:"Citizen Feedback",icon:"📱"},
+ {id:"executive",label:"Mayor / Administration",icon:"🖥️"}
+];
+let state={
+ persona:0, screen:"home", complaintStep:1, submitted:false, assigned:false, citizenPhotoAdded:true, citizenLocationConfirmed:true, citizenDept:"Roads & Engineering",
+ verified:false, resolved:false, rating:0, notification:false, language:"EN",
+ caseStatus:"New", selectedAction:null, toast:null
+};
+const app=document.getElementById("app");
+function notify(t){const x=document.getElementById("toast");x.textContent=t;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),2300)}
+function go(i,screen=null){state.persona=i; state.screen=screen||defaultScreen(personas[i].id); render()}
+function defaultScreen(id){return id==="citizen"?"home":id==="control"?"dashboard":id==="officer"?"dashboard":id==="field"?"tasks":id==="resolution"?"feedback":"dashboard"}
+function resetDemo(){state={persona:0,screen:"home",complaintStep:1,submitted:false,assigned:false,citizenPhotoAdded:true,citizenLocationConfirmed:true,citizenDept:"Roads & Engineering",verified:false,resolved:false,rating:0,notification:false,language:"EN",caseStatus:"New",selectedAction:null,fieldStep:1,evidenceAdded:false,commentsAdded:false,fieldComment:"",workCompleted:false};render();notify("Demo reset")}
+function nextPersona(){go((state.persona+1)%personas.length)}
+function esc(s){return String(s).replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]))}
+function stepBar(){
+ const labels=["01 Citizen","02 Control Room","03 Officer","04 Ground Team","05 Citizen","06 Mayor / Admin"];
+ return labels.map((x,i)=>`<button class="step ${i===state.persona?"active":i<state.persona?"done":""}" onclick="go(${i})">${x}</button>`).join("")
+}
+function render(){
+ document.getElementById("steps").innerHTML=stepBar();
+ const id=personas[state.persona].id;
+ if(id==="citizen") app.innerHTML=citizenApp();
+ if(id==="control") app.innerHTML=controlApp();
+ if(id==="officer") app.innerHTML=officerApp();
+ if(id==="field") app.innerHTML=fieldApp();
+ if(id==="resolution") app.innerHTML=resolutionApp();
+ if(id==="executive") app.innerHTML=executiveApp();
+}
+function topbar(name,role){
+ return `<div class="topbar"><div class="logo"><div class="logo-mark">T</div>TMC JanSeva</div><div class="top-actions"><span class="small">${name} · ${role}</span><div class="avatar">${name[0]}</div></div></div>`
+}
+function sidebar(active,items){
+ return `<aside class="sidebar"><div class="nav-title">Workspace</div>${items.map(x=>`<div class="nav ${active===x[0]?"active":""}" onclick="${x[2]||""}">${x[1]}</div>`).join("")}<div class="nav-title">System</div><div class="nav">⚙ Settings</div><div class="nav">▣ Audit & Logs</div></aside>`
+}
+function desktop(content,name,role,active,items){
+ return `<div class="app">${topbar(name,role)}<div class="layout">${sidebar(active,items)}<main class="content">${content}</main></div></div>`
+}
+function mobile(content){
+ return `<div class="mobile-shell"><div class="phone"><div class="mobile-head"><div class="logo" style="font-size:15px"><div class="logo-mark" style="width:29px;height:29px;font-size:13px">T</div>TMC JanSeva</div><button onclick="toggleLang()" style="border:0;background:none;color:#6d28d9;font-weight:750">${state.language==="EN"?"मराठी":"English"}</button></div><div class="mobile-body">${content}</div></div></div>`
+}
+function toggleLang(){state.language=state.language==="EN"?"MR":"EN";render()}
+function citizenApp(){
+ let c;
+ if(state.screen==="report") c=citizenReport();
+ else if(state.screen==="track") c=citizenTrack();
+ else c=citizenHome();
+ return mobile(c);
+}
+function citizenHome(){
+ return `<div class="small">${state.language==="EN"?"THANE MUNICIPAL CORPORATION":"ठाणे महानगरपालिका"}</div>
+ <h2 style="margin:5px 0 17px">${state.language==="EN"?"How can we help?":"आपली कशी मदत करू?"}</h2>
+ <div class="hero-card"><div class="tiny">TMC JANSEVA</div><div class="big">${state.language==="EN"?"Report a civic issue":"नागरी समस्या नोंदवा"}</div><div style="font-size:12px;line-height:1.5">${state.language==="EN"?"Report roads, water, sanitation, streetlights and other civic issues.":"रस्ते, पाणी, स्वच्छता, पथदिवे आणि इतर नागरी समस्या नोंदवा."}</div><button onclick="go(0,'report')" style="margin-top:15px;width:100%;border:0;border-radius:12px;padding:12px;background:#fff;color:#5b21b6;font-weight:800">＋ ${state.language==="EN"?"Start a complaint":"तक्रार नोंदवा"}</button></div>
+ <div class="card" style="margin-top:14px" onclick="go(0,'track')"><b>◷ Track your grievance</b><div class="small" style="margin-top:5px">CGMS-2026-10482 · ${state.caseStatus}</div><div class="bar" style="margin-top:10px"><i style="width:${state.resolved?100:state.verified?70:state.assigned?50:state.submitted?25:5}%"></i></div></div>
+ <div class="small" style="margin:19px 2px 8px">Quick services</div><div class="grid g2"><div class="card" onclick="go(0,'report')"><b>🛣️ Roads</b><div class="small">Potholes & damage</div></div><div class="card" onclick="go(0,'report')"><b>💧 Water</b><div class="small">Supply issues</div></div></div>`
+}
+function citizenReport(){
+ const steps=[
+  ["1","Details","Enter complaint details"],
+  ["2","Review","Check and submit"]
+ ];
+ let body="";
+ if(state.complaintStep===1) body=`
+  <div class="small">Step 1 of 2</div>
+  <h2 style="margin:5px 0 5px">Tell us about the problem</h2>
+  <div class="small">Enter the issue, select the responsible service area, add a photo and confirm the location.</div>
+
+  <label class="small" style="display:block;margin-top:14px"><b>What happened?</b></label>
+  <textarea id="complaintText" style="width:100%;height:105px;margin-top:7px;border:1px solid #dfe4ec;border-radius:14px;padding:13px;resize:none" placeholder="Example: There is a large pothole near the school gate...">There is a large pothole near the ZP School on the main road. It is dangerous for two-wheelers at night.</textarea>
+
+  <label class="small" style="display:block;margin-top:12px"><b>Department / service</b></label>
+  <select id="complaintDept" class="form-field" style="margin-top:6px">
+    <option>Roads & Engineering</option>
+    <option>Water Supply</option>
+    <option>Solid Waste Management</option>
+    <option>Street Lighting</option>
+    <option>Health & Sanitation</option>
+  </select>
+
+  <label class="small" style="display:block;margin-top:12px"><b>Photos</b></label>
+  <div class="upload" onclick="addCitizenPhoto()">
+    📷<br><b>${state.citizenPhotoAdded?"Photo attached · tap to replace":"Add a photo"}</b><br>
+    <span class="small">A photo helps TMC understand the issue faster</span>
+  </div>
+
+  <label class="small" style="display:block;margin-top:12px"><b>Location</b></label>
+  <div class="card" style="margin-top:6px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><b>📍 Near ZP School, Thane West</b><div class="small">GPS location detected</div></div>
+      <span class="status done">GPS ready</span>
+    </div>
+    <div class="map" style="height:155px;margin-top:10px"><i class="pin p2"></i></div>
+    <div class="grid g2" style="margin-top:9px">
+      <button class="btn" onclick="useCitizenGPS()">⌖ Use GPS</button>
+      <button class="btn" onclick="notify('Location search opened in demo')">Search location</button>
+    </div>
+  </div>
+
+  <div class="grid g2" style="margin-top:10px">
+    <button class="btn" onclick="voiceDemo()">🎙 Voice input</button>
+    <button class="btn" onclick="notify('Draft saved automatically')">Save draft</button>
+  </div>
+  <button class="mobile-action" style="margin-top:12px" onclick="complaintNext()">Review complaint →</button>`;
+
+ if(state.complaintStep===2) body=`
+  <div class="small">Step 2 of 2</div>
+  <h2 style="margin:5px 0 5px">Review before submitting</h2>
+  <div class="small">Everything looks good? Submit once and TMC will route it automatically.</div>
+
+  <div class="ai-box" style="margin-top:13px">
+    <div class="ai-title">✦ AI-assisted routing</div>
+    <div class="chips">
+      <span class="chip">Road infrastructure</span>
+      <span class="chip">Pothole</span>
+      <span class="chip">High priority</span>
+    </div>
+    <p class="small" style="margin-bottom:0">The system will validate the complaint and route it to the selected TMC department.</p>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="small">Complaint</div>
+    <b>Road damage near ZP School</b>
+    <div class="small" style="margin-top:7px">${state.citizenDept||"Roads & Engineering"} · Thane West</div>
+    <hr style="border:0;border-top:1px solid #eee;margin:12px 0">
+    <div class="small">Your description</div>
+    <div style="font-size:13px;line-height:1.45;margin-top:4px">There is a large pothole near the ZP School on the main road. It is dangerous for two-wheelers at night.</div>
+    <div class="grid g2" style="margin-top:12px">
+      <div class="card" style="margin:0;padding:10px;background:#f8fafc"><div class="small">Photo</div><b>✓ Attached</b></div>
+      <div class="card" style="margin:0;padding:10px;background:#f8fafc"><div class="small">Location</div><b>✓ GPS captured</b></div>
+    </div>
+  </div>
+
+  <div class="success-box" style="margin-top:12px">
+    <b>✓ After submission</b><br>
+    <span class="small">You receive a grievance ID and can track progress from the app.</span>
+  </div>
+  <button class="mobile-action" style="margin-top:12px" onclick="submitComplaint()">Submit grievance ✓</button>`;
+
+ return `<div class="small">New grievance</div>
+ <div style="display:flex;justify-content:space-between;align-items:center;margin:5px 0 13px">
+   <h2 style="margin:0">Report a problem</h2>
+   <button class="btn" style="padding:6px 9px" onclick="go(0,'home')">×</button>
+ </div>
+ <div style="display:flex;gap:5px;margin-bottom:15px">
+   ${steps.map((x,i)=>`<div style="flex:1"><div style="height:5px;border-radius:5px;background:${i<state.complaintStep?"#7c3aed":"#e5e7eb"}"></div><div style="font-size:9px;color:${i<state.complaintStep?"#6d28d9":"#9aa3b2"};margin-top:4px">${x[0]} ${x[1]}</div></div>`).join("")}
+ </div>${body}`;
+}
+function complaintNext(){
+ if(state.complaintStep===1){
+   const el=document.getElementById("complaintText");
+   const dept=document.getElementById("complaintDept");
+   if(el) state.citizenDescription=el.value.trim();
+   if(dept) state.citizenDept=dept.value;
+   if(!state.citizenPhotoAdded) { notify("Add at least one photo before reviewing"); return; }
+   state.complaintStep=2;
+   render();
+ }
+}
+function addCitizenPhoto(){
+ state.citizenPhotoAdded=true;
+ render();
+ notify("✓ Photo attached");
+}
+function useCitizenGPS(){
+ state.citizenLocationConfirmed=true;
+ render();
+ notify("✓ Current location captured");
+}
+function voiceDemo(){notify("Voice input captured · Marathi/English supported")}
+function submitComplaint(){
+ state.submitted=true;
+ state.caseStatus="Submitted";
+ state.complaintStep=2;
+ state.persona=1;
+ state.screen="dashboard";
+ render();
+ notify("CGMS-2026-10482 created and routed to TMC");
+}
+function citizenTrack(){
+ return `<div class="small">Grievance tracking</div><h2 style="margin:5px 0 15px">CGMS-2026-10482</h2>
+ <div class="success-box"><b>${state.resolved?"✓ Resolved":"● "+state.caseStatus}</b><br><span class="small">${state.resolved?"Your complaint has been resolved by TMC.":"You can follow every step of the resolution."}</span></div>
+ <div class="card" style="margin-top:12px"><b>Road damage near ZP School</b><div class="small">Thane West · High priority</div><div class="timeline" style="margin-top:15px"><div class="event"><div class="time">10:21 AM</div><div class="txt">Complaint submitted</div></div><div class="event"><div class="time">10:22 AM</div><div class="txt">AI classified & routed</div></div><div class="event"><div class="time">11:05 AM</div><div class="txt">Department accepted</div></div>${state.verified||state.resolved?`<div class="event"><div class="time">2:42 PM</div><div class="txt">Field verification completed</div></div>`:""}${state.resolved?`<div class="event"><div class="time">4:18 PM</div><div class="txt">Resolution submitted</div></div>`:""}</div></div>
+ <button class="mobile-action" style="margin-top:12px" onclick="notify('Notification preferences opened')">Manage notifications</button>`
+}
+function controlApp(){
+ if(state.screen==="case") return desktop(controlCase(),"Aditi","Control Room Operator","cases",[["dashboard","◫ Dashboard","go(1,'dashboard')"],["cases","▣ Grievances","go(1,'case')"],["map","⌖ GIS Map","notify('GIS view opened')"],["sla","◷ SLA Monitor","notify('SLA monitor opened')"],["esc","↗ Escalations","notify('Escalations opened')"]]);
+ return desktop(controlDashboard(),"Aditi","Control Room Operator","dashboard",[["dashboard","◫ Dashboard","go(1,'dashboard')"],["cases","▣ Grievances","go(1,'case')"],["map","⌖ GIS Map","notify('GIS view opened')"],["sla","◷ SLA Monitor","notify('SLA monitor opened')"],["esc","↗ Escalations","notify('Escalations opened')"]])
+}
+function controlDashboard(){
+ return header("Grievance Control Room","Central triage, routing, SLA and escalation workspace.",`<button class="btn primary" onclick="go(1,'case')">Open live case</button>`) +
+ `<div class="grid g4"><div class="card metric"><div class="label">New today</div><div class="num">126</div><div class="delta">↑ 12%</div></div><div class="card metric"><div class="label">Unassigned</div><div class="num">${state.submitted?1:18}</div><div class="delta">Queue</div></div><div class="card metric"><div class="label">At SLA risk</div><div class="num">18</div><div class="delta" style="color:#d97706">Needs action</div></div><div class="card metric"><div class="label">SLA compliance</div><div class="num">91.8%</div><div class="delta">↑ 2.4 pts</div></div></div>
+ <div class="card" style="margin-top:16px"><div style="display:flex;justify-content:space-between"><h3>Live grievance queue</h3><button class="btn" onclick="go(1,'case')">View all 1,284 →</button></div>
+ <div class="case-row" onclick="go(1,'case')" style="cursor:pointer"><div><div class="strong">CGMS-2026-10482</div><div class="small">Road damage near ZP School</div></div><div class="small">Thane West · Road</div><div><span class="status high">High</span></div><div><span class="status ${state.assigned?'progress':'open'}">${state.assigned?'Assigned':'New'}</span></div><b>→</b></div>
+ <div class="case-row"><div><div class="strong">CGMS-2026-10479</div><div class="small">Water supply disruption</div></div><div class="small">Wagle Estate</div><div><span class="status high">Critical</span></div><div><span class="status progress">Assigned</span></div><b>→</b></div>
+ <div class="case-row"><div><div class="strong">CGMS-2026-10473</div><div class="small">Streetlight failure</div></div><div class="small">Manpada</div><div><span class="status open">Medium</span></div><div><span class="status progress">In progress</span></div><b>→</b></div></div>
+ <div class="grid g2" style="margin-top:16px"><div class="card"><h3>AI triage health</h3><div class="ai-box"><div class="ai-title">✦ Processing pipeline</div><p class="small">Classification accuracy · 96%<br>Auto-routing rate · 88%<br>Location match · 94%</p><div class="bar"><i style="width:88%"></i></div></div></div><div class="card"><h3>SLA watchlist</h3><div class="alert"><b>18 grievances at risk</b><br><span class="small">6 road · 5 water · 4 sanitation · 3 other</span></div><div style="margin-top:12px"><span class="status high">7 escalated</span> <span class="status open">11 due today</span></div></div></div>`
+}
+function controlCase(){
+ return header("Grievance case · CGMS-2026-10482","Single-case command view. Every action updates the shared demonstration state.",`<button class="btn" onclick="go(1,'dashboard')">← Back to queue</button>`) +
+ `<div class="grid g3"><div class="card"><div class="small">Priority</div><h3><span class="status high">HIGH</span></h3><div class="small">Public safety impact</div></div><div class="card"><div class="small">SLA</div><h3>18h 24m remaining</h3><div class="bar"><i style="width:72%"></i></div></div><div class="card"><div class="small">Current owner</div><h3>${state.assigned?"Roads Engineering":"Control Room"}</h3><div class="small">${state.assigned?"Field verification assigned":"Awaiting assignment"}</div></div></div>
+ <div class="grid g2" style="margin-top:16px"><div class="card"><h3>Complaint</h3><p><b>Road damage near ZP School</b></p><p class="small">“There is a large pothole on the main road. It is dangerous for two-wheelers at night.”</p><div class="chips"><span class="chip">Citizen mobile</span><span class="chip">GPS captured</span><span class="chip">Photo attached</span></div><div class="map" style="margin-top:14px"><i class="pin p2"></i></div></div>
+ <div class="card"><h3>AI + GIS assessment</h3><div class="ai-box"><div class="ai-title">✦ AI recommendation</div><div class="chips"><span class="chip">Road infrastructure</span><span class="chip">Pothole</span><span class="chip">High priority</span></div><p class="small">Recommended routing: TMC Roads / Engineering. Jurisdiction matched to Thane West zone.</p></div><h3 style="margin-top:17px">Actions</h3><div class="grid g2"><button class="btn primary" onclick="assignFromControl()">Assign department</button><button class="btn" onclick="notify('Escalation reason form opened')">Escalate</button><button class="btn" onclick="notify('Citizen notification sent')">Notify citizen</button><button class="btn" onclick="notify('Case placed on hold')">Put on hold</button></div></div></div>
+ <div class="card" style="margin-top:16px"><h3>Case timeline & audit trail</h3>${caseTimeline()}</div>`
+}
+function assignFromControl(){state.assigned=true;state.caseStatus="Assigned";state.persona=2;state.screen="case";render();notify("Assigned to Roads / Engineering Officer")}
+function caseTimeline(){
+ return `<div class="timeline"><div class="event"><div class="time">10:21 AM</div><div class="txt">Complaint submitted</div><div class="by">Citizen mobile</div></div><div class="event"><div class="time">10:21 AM</div><div class="txt">AI classified · High priority</div><div class="by">CGMS Intelligence</div></div><div class="event"><div class="time">10:22 AM</div><div class="txt">GIS jurisdiction matched</div><div class="by">GIS Engine</div></div>${state.assigned?`<div class="event"><div class="time">11:05 AM</div><div class="txt">Assigned to Roads / Engineering</div><div class="by">Control Room</div></div>`:""}</div>`
+}
+function officerApp(){
+ if(state.screen==="case")return desktop(officerCase(),"Rahul","Roads / Engineering Officer","cases",[["dashboard","◫ My Dashboard","go(2,'dashboard')"],["cases","▣ Assigned Cases","go(2,'case')"],["sla","◷ SLA & Escalations","notify('SLA monitor opened')"],["team","♟ Field Team","notify('Team roster opened')"],["reports","▤ Reports","notify('Reports opened')"]]);
+ return desktop(officerDashboard(),"Rahul","Roads / Engineering Officer","dashboard",[["dashboard","◫ My Dashboard","go(2,'dashboard')"],["cases","▣ Assigned Cases","go(2,'case')"],["sla","◷ SLA & Escalations","notify('SLA monitor opened')"],["team","♟ Field Team","notify('Team roster opened')"],["reports","▤ Reports","notify('Reports opened')"]])
+}
+function officerDashboard(){
+ return header("Roads & Engineering · My Dashboard","Department workload, SLA exposure, field operations and resolution pipeline.",`<button class="btn primary" onclick="go(2,'case')">Open priority case</button>`) +
+ `<div class="grid g4"><div class="card metric"><div class="label">Assigned cases</div><div class="num">24</div><div class="delta">6 due today</div></div><div class="card metric"><div class="label">Field visits</div><div class="num">8</div><div class="delta">3 pending</div></div><div class="card metric"><div class="label">SLA score</div><div class="num">94%</div><div class="delta">Above target</div></div><div class="card metric"><div class="label">Avg resolution</div><div class="num">1.7d</div><div class="delta">↓ 0.3d</div></div></div>
+ <div class="grid g2" style="margin-top:16px"><div class="card"><h3>Priority work queue</h3><div class="case-row" onclick="go(2,'case')" style="cursor:pointer"><div><b>CGMS-2026-10482</b><div class="small">Road damage · ZP School</div></div><span class="status high">High</span><span class="status ${state.verified?'done':'progress'}">${state.verified?'Verified':'Field visit'}</span><b>→</b></div><div class="case-row"><div><b>CGMS-2026-10471</b><div class="small">Drainage overflow</div></div><span class="status high">High</span><span class="status progress">Assigned</span><b>→</b></div></div><div class="card"><h3>Department SLA distribution</h3><div class="small">Within SLA</div><div class="bar" style="margin:7px 0 13px"><i style="width:78%"></i></div><div class="small">At risk</div><div class="bar" style="margin:7px 0 13px"><i style="width:16%;background:#d97706"></i></div><div class="small">Breached</div><div class="bar" style="margin:7px 0 0"><i style="width:6%;background:#dc3545"></i></div></div></div>`
+}
+function officerCase(){
+ return header("Case action centre · CGMS-2026-10482","All evidence, AI reasoning, SLA controls and next actions in one place.",`<button class="btn" onclick="go(2,'dashboard')">← Back</button>`) +
+ `<div class="card"><div style="display:flex;justify-content:space-between;gap:15px"><div><div class="small">ROAD INFRASTRUCTURE · HIGH</div><h2 style="margin:4px 0">Road damage near ZP School</h2><div class="small">Citizen reported · Thane West · 10:21 AM</div></div><span class="status ${state.verified?'done':'progress'}">${state.verified?'Field verified':'Awaiting field verification'}</span></div>
+ <div class="grid g2" style="margin-top:17px"><div><h3>AI assessment</h3><div class="ai-box"><div class="ai-title">✦ Recommended workflow</div><div class="chips"><span class="chip">Pothole</span><span class="chip">Public safety</span><span class="chip">24h SLA</span><span class="chip">GPS matched</span></div><p class="small">Field verification is required before resolution.</p></div></div><div><h3>Location</h3><div class="map"><i class="pin p2"></i></div></div></div>
+ <div style="margin-top:17px"><h3>Available actions</h3><div class="grid g3">${state.verified?`<button class="btn success" onclick="resolveFromOfficer()">✓ Submit resolution</button><button class="btn" onclick="notify('Additional field visit requested')">Request re-visit</button><button class="btn" onclick="notify('Escalated to senior officer')">Escalate</button>`:`<button class="btn primary" onclick="assignFieldFromOfficer()">Assign field team</button><button class="btn" onclick="notify('Citizen notification sent')">Notify citizen</button><button class="btn" onclick="notify('Escalated to executive')">Escalate</button>`}</div></div></div>
+ <div class="grid g2" style="margin-top:16px"><div class="card"><h3>Evidence</h3><div class="photo"></div><div class="small" style="margin-top:7px">Citizen-submitted image · GPS metadata available</div></div><div class="card"><h3>Audit trail</h3>${caseTimeline()}${state.verified?`<div class="success-box">✓ Ground team verified issue at 2:42 PM.</div>`:""}</div></div>`
+}
+const baseOfficerCaseForResolution = officerCase;
+officerCase = function(){
+  const base = baseOfficerCaseForResolution();
+  return base + (state.resolutionConfirmOpen ? resolutionConfirmModal() : "");
+};
+function resolutionConfirmModal(){
+  return `<div class="assignment-overlay" onclick="if(event.target===this)closeResolutionConfirm()">
+    <div class="assignment-modal resolution-modal">
+      <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start">
+        <div>
+          <div class="eyebrow">DEPARTMENT OFFICER · FINAL ACTION</div>
+          <h2 style="margin:5px 0 4px">Confirm resolution</h2>
+          <div class="small">CGMS-2026-10482 · Road damage near ZP School</div>
+        </div>
+        <button class="btn" onclick="closeResolutionConfirm()" aria-label="Close">✕</button>
+      </div>
+
+      <div class="alert" style="margin-top:18px">
+        <b>Are you sure you want to resolve this grievance?</b><br>
+        <span class="small">Once submitted, the case will be marked resolved and the citizen will be notified.</span>
+      </div>
+
+      <div class="card" style="margin-top:14px;background:#f8fafc;box-shadow:none">
+        <b>Before you continue, make sure everything is checked:</b>
+        <div style="display:grid;gap:10px;margin-top:12px">
+          <label style="display:flex;gap:9px;align-items:flex-start"><input type="checkbox" id="resolveCheck1"> <span><b>Field evidence reviewed</b><br><span class="small">Photo, GPS verification and field note are satisfactory.</span></span></label>
+          <label style="display:flex;gap:9px;align-items:flex-start"><input type="checkbox" id="resolveCheck2"> <span><b>Work completion verified</b><br><span class="small">The reported issue has been addressed or the recorded action is sufficient.</span></span></label>
+          <label style="display:flex;gap:9px;align-items:flex-start"><input type="checkbox" id="resolveCheck3"> <span><b>Citizen communication understood</b><br><span class="small">The citizen will receive the resolution update after submission.</span></span></label>
+        </div>
+      </div>
+
+      <div class="grid g2" style="margin-top:16px">
+        <button class="btn" onclick="closeResolutionConfirm()">Cancel</button>
+        <button class="btn success" onclick="confirmResolutionWithChecks()">Confirm & resolve ✓</button>
+      </div>
+    </div>
+  </div>`;
+}
+function confirmResolutionWithChecks(){
+  const checks = ["resolveCheck1","resolveCheck2","resolveCheck3"];
+  if(!checks.every(id=>document.getElementById(id)?.checked)){
+    notify("Please confirm all three checks before resolving");
+    return;
+  }
+  confirmResolution();
+}
+
+function assignFieldFromOfficer(){state.assigned=true;state.caseStatus="Field Visit";state.persona=3;state.screen="tasks";render();notify("Field task assigned")}
+function resolveFromOfficer(){
+  state.resolutionConfirmOpen=true;
+  render();
+}
+function closeResolutionConfirm(){
+  state.resolutionConfirmOpen=false;
+  render();
+}
+function confirmResolution(){
+  state.resolutionConfirmOpen=false;
+  state.resolved=true;
+  state.caseStatus="Resolved";
+  state.notification=true;
+  state.persona=2;
+  state.screen="dashboard";
+  render();
+  notify("✓ Resolution submitted · Citizen notified");
+}
+function fieldApp(){
+ return mobile(`<div class="small">Ground Operations</div><h2 style="margin:4px 0 15px">My field tasks</h2>
+ <div class="card" style="border-left:4px solid #dc3545"><div style="display:flex;justify-content:space-between"><span class="status high">HIGH</span><span class="small">SLA 05h 42m</span></div><h3 style="margin-top:11px">Road damage near ZP School</h3><div class="small">CGMS-2026-10482 · Thane West</div><button class="mobile-action" style="margin-top:14px" onclick="fieldDetail()">Open field task →</button></div>
+ <div class="card" style="margin-top:12px"><b>Today's route</b><div class="map" style="height:170px;margin-top:10px"><i class="pin p2"></i></div><div class="small" style="margin-top:8px">3 assigned visits · 1 high priority</div></div>`)
+}
+function fieldDetail(){
+ state.screen="detail";render()
+}
+function fieldScreen(){
+ return mobile(`<div class="small">Field task · Step ${state.verified?3:1} of 3</div><h2 style="margin:4px 0 12px">Verify reported issue</h2><div class="card"><b>Road damage near ZP School</b><div class="small">Navigate to reported GPS location</div><div class="map" style="height:160px;margin-top:10px"><i class="pin p2"></i></div><button class="mobile-action" style="margin-top:10px" onclick="captureEvidence()">I'm at the location</button></div>${state.verified?`<div class="success-box" style="margin-top:12px"><b>✓ Evidence verified</b><br><span class="small">AI photo verification · 94% confidence · GPS matched</span></div>`:""}`);
+}
+function captureEvidence(){state.verified=true;state.caseStatus="Field Verified";state.persona=2;state.screen="case";render();notify("Geo-tagged before/after evidence captured")}
+function resolutionApp(){return mobile(`<div class="small">Grievance update</div><h2 style="margin:4px 0 15px">Your complaint is ${state.resolved?"resolved":"in progress"}</h2>${state.resolved?`<div class="success-box"><b>✓ TMC has completed the reported repair</b><br><span class="small">Resolution evidence has been attached to your case.</span></div>`:`<div class="card"><b>Field verification completed</b><div class="small">The TMC team has confirmed the issue and action is underway.</div></div>`}<div class="card" style="margin-top:12px"><div class="small">CGMS-2026-10482</div><h3>Road damage near ZP School</h3><div class="grid g2"><div><div class="small">Before</div><div class="photo"></div></div><div><div class="small">After</div><div class="photo" style="background:linear-gradient(145deg,#334155,#94a3b8 55%,#64748b)"></div></div></div></div>${state.resolved?`<div class="card" style="margin-top:12px"><b>How was the resolution?</b><div class="small">Rate the service you received.</div><div class="chips">${[1,2,3,4,5].map(n=>`<button class="chip" onclick="rate(${n})" style="${state.rating===n?'background:#ede9fe;color:#6d28d9;font-weight:800':''}">${"★".repeat(n)}</button>`).join("")}</div></div>`:""}<button class="mobile-action" style="margin-top:10px" onclick="go(5,'dashboard')">View TMC impact</button>`)}
+function rate(n){state.rating=n;render();notify("Feedback recorded")}
+function executiveApp(){
+ return desktop(executiveDashboard(),"Meera","Mayor / Administration","dashboard",[["dashboard","▣ Governance Overview","go(5,'dashboard')"],["performance","◷ Service Performance","go(5,'performance')"],["map","⌖ GIS Intelligence","go(5,'gis')"],["departments","▤ Department Scorecards","openDepartmentScorecards()"],["citizen","◉ Citizen Experience","go(5,'citizen')"],["reports","↗ Decision Reports","notify('Decision report opened')"]])
+}
+function executiveDashboard(){
+ return header("TMC Governance Command Centre","Decision-grade view of service delivery, citizen experience, operational risk and geographic hotspots.",`<select><option>Thane Municipal Corporation</option><option>All zones</option><option>Last 30 days</option></select>`) +
+ `<div class="grid g4"><div class="card metric"><div class="label">Total grievances</div><div class="num">12,482</div><div class="delta">↓ 8.4% vs prior period</div></div><div class="card metric"><div class="label">Open</div><div class="num">1,284</div><div class="delta">10.3% of total</div></div><div class="card metric"><div class="label">SLA compliance</div><div class="num">91.8%</div><div class="delta">↑ 2.4 pts</div></div><div class="card metric"><div class="label">Citizen satisfaction</div><div class="num">4.4/5</div><div class="delta">↑ 0.2</div></div></div>
+ <div class="grid g4" style="margin-top:16px"><div class="card metric"><div class="label">Resolved this month</div><div class="num">4,812</div><div class="delta">↑ 14%</div></div><div class="card metric"><div class="label">SLA at risk</div><div class="num">142</div><div class="delta" style="color:#d97706">Needs intervention</div></div><div class="card metric"><div class="label">Escalated</div><div class="num">37</div><div class="delta" style="color:#dc3545">7 critical</div></div><div class="card metric"><div class="label">Reopened</div><div class="num">84</div><div class="delta">1.1% of resolved</div></div></div>
+ <div class="grid g2" style="margin-top:16px"><div class="card"><h3>District service map</h3><div class="map" style="height:300px"><i class="pin p1"></i><i class="pin p2"></i><i class="pin p3"></i></div><div class="small" style="margin-top:8px">Complaint density · SLA hotspots · emerging clusters</div></div><div class="card"><h3>Executive alerts</h3><div class="alert"><b>Road complaints emerging as a hotspot</b><br><span class="small">Review preventive maintenance around high-footfall corridors.</span></div><div class="alert" style="margin-top:9px"><b>142 grievances at SLA risk</b><br><span class="small">Highest exposure: Roads, Water Supply and Sanitation.</span></div><div class="success-box" style="margin-top:9px"><b>CGMS-2026-10482 resolved</b><br><span class="small">SLA met · citizen feedback requested · evidence captured.</span></div></div></div>
+ <div class="card" style="margin-top:16px"><h3>Department scorecard</h3><table class="table"><tr><th>Service area</th><th>Open</th><th>SLA</th><th>Avg resolution</th><th>Citizen rating</th></tr><tr><td>Roads & Engineering</td><td>382</td><td>86%</td><td>2.4d</td><td>4.1</td></tr><tr><td>Water Supply</td><td>241</td><td>91%</td><td>1.8d</td><td>4.3</td></tr><tr><td>Sanitation</td><td>198</td><td>94%</td><td>1.3d</td><td>4.5</td></tr><tr><td>Street Lighting</td><td>176</td><td>89%</td><td>1.7d</td><td>4.2</td></tr></table></div>`
+}
+function executiveDetail(title,sub,body){
+ return desktop(header(title,sub,`<button class="btn" onclick="go(5,'dashboard')">← Governance overview</button>`), "Meera","Mayor / Administration",state.screen,[["dashboard","▣ Governance Overview","go(5,'dashboard')"],["performance","◷ Service Performance","go(5,'performance')"],["map","⌖ GIS Intelligence","go(5,'gis')"],["departments","▤ Department Scorecards","state.persona=5;state.screen='departments';render()"],["citizen","◉ Citizen Experience","go(5,'citizen')"],["reports","↗ Decision Reports","notify('Report opened')"]])+body
+}
+function executivePerformance(){return executiveDetail("Service Performance","SLA, resolution speed, backlog, escalation and workload trends.",`<div class="grid g4"><div class="card metric"><div class="label">SLA compliance</div><div class="num">91.8%</div></div><div class="card metric"><div class="label">Avg resolution</div><div class="num">1.9d</div></div><div class="card metric"><div class="label">Backlog</div><div class="num">1,284</div></div><div class="card metric"><div class="label">Escalation rate</div><div class="num">2.9%</div></div><div class="card" style="grid-column:1/-1"><h3>Operational parameters</h3><table class="table"><tr><th>Metric</th><th>Current</th><th>Target</th><th>Status</th></tr><tr><td>SLA compliance</td><td>91.8%</td><td>90%</td><td><span class="status done">On target</span></td></tr><tr><td>Citizen satisfaction</td><td>4.4/5</td><td>4.2/5</td><td><span class="status done">On target</span></td></tr><tr><td>Reopen rate</td><td>1.1%</td><td>&lt;2%</td><td><span class="status done">On target</span></td></tr><tr><td>Critical SLA breach</td><td>7</td><td>0</td><td><span class="status high">Intervene</span></td></tr></table></div></div>`) }
+function executiveGIS(){return executiveDetail("GIS Intelligence","Geographic distribution, complaint clusters, jurisdiction and emerging hotspots.",`<div class="grid g2"><div class="card"><h3>Live hotspot map</h3><div class="map" style="height:430px"><i class="pin p1"></i><i class="pin p2"></i><i class="pin p3"></i></div></div><div class="card"><h3>Hotspot intelligence</h3><div class="case-row"><div><b>Road infrastructure</b><div class="small">Thane West corridor</div></div><span class="status high">High</span><b>38%</b></div><div class="case-row"><div><b>Water supply</b><div class="small">Wagle Estate cluster</div></div><span class="status open">Watch</span><b>21%</b></div><div class="case-row"><div><b>Sanitation</b><div class="small">High-density zones</div></div><span class="status progress">Stable</span><b>12%</b></div></div></div>`) }
+function executiveDepartments(){
+ const data=[
+  {d:"Roads & Engineering",open:382,risk:32,sla:86,res:2.4,rating:4.1,trend:"↓ 3.2 pts",health:72},
+  {d:"Water Supply",open:241,risk:18,sla:91,res:1.8,rating:4.3,trend:"↑ 1.4 pts",health:84},
+  {d:"Sanitation",open:198,risk:9,sla:94,res:1.3,rating:4.5,trend:"↑ 2.1 pts",health:91},
+  {d:"Street Lighting",open:176,risk:14,sla:89,res:1.7,rating:4.2,trend:"↑ 0.8 pts",health:80},
+  {d:"Solid Waste",open:154,risk:7,sla:95,res:1.2,rating:4.6,trend:"↑ 2.8 pts",health:94},
+  {d:"Public Health",open:133,risk:5,sla:96,res:1.1,rating:4.7,trend:"↑ 3.1 pts",health:97}
+ ];
+ const maxOpen=Math.max(...data.map(x=>x.open));
+ return executiveDetail("Department Scorecards","Compare service delivery performance, workload, SLA risk and citizen outcomes across TMC departments.",`
+ <div class="grid g4">
+   <div class="card metric"><div class="label">Best SLA</div><div class="num">96%</div><div class="delta">Public Health</div></div>
+   <div class="card metric"><div class="label">Highest workload</div><div class="num">382</div><div class="delta" style="color:#b42318">Roads & Engineering</div></div>
+   <div class="card metric"><div class="label">Fastest resolution</div><div class="num">1.1d</div><div class="delta">Public Health</div></div>
+   <div class="card metric"><div class="label">Best citizen rating</div><div class="num">4.7/5</div><div class="delta">Public Health</div></div>
+ </div>
+ <div class="grid g2" style="margin-top:16px">
+   <div class="card dept-chart-card"><div class="section-head"><div><h3>Workload by department</h3><div class="small">Open grievances · current period</div></div><span class="chart-note">Lower backlog is better</span></div>
+     ${data.map(x=>`<div class="dept-bar-row"><div class="dept-bar-label"><b>${x.d}</b><span>${x.open}</span></div><div class="bar"><i style="width:${Math.round(x.open/maxOpen*100)}%"></i></div></div>`).join("")}
+   </div>
+   <div class="card dept-chart-card"><div class="section-head"><div><h3>SLA compliance</h3><div class="small">% grievances resolved within SLA</div></div><span class="chart-note">Target ≥ 90%</span></div>
+     ${data.map(x=>`<div class="dept-bar-row"><div class="dept-bar-label"><b>${x.d}</b><span>${x.sla}%</span></div><div class="bar sla-bar"><i style="width:${x.sla}%"></i></div></div>`).join("")}
+   </div>
+ </div>
+ <div class="card" style="margin-top:16px"><div class="section-head"><div><h3>Department performance matrix</h3><div class="small">Identify where executive intervention is needed.</div></div><select><option>Last 30 days</option><option>Last 90 days</option><option>Year to date</option></select></div>
+   <div class="table-wrap"><table class="table dept-table"><tr><th>Department</th><th>Open</th><th>At risk</th><th>SLA</th><th>Avg resolution</th><th>Citizen rating</th><th>Trend</th><th>Health</th></tr>
+   ${data.map(x=>`<tr><td><b>${x.d}</b></td><td>${x.open}</td><td><span class="${x.risk>20?'risk-number':'normal-number'}">${x.risk}</span></td><td><b>${x.sla}%</b></td><td>${x.res}d</td><td>${x.rating}/5</td><td><span class="trend ${x.trend.includes('↓')?'down':''}">${x.trend}</span></td><td><div class="health-cell"><div class="health-track"><i style="width:${x.health}%"></i></div><b>${x.health}</b></div></td></tr>`).join("")}
+   </table></div>
+ </div>
+ <div class="grid g2" style="margin-top:16px">
+   <div class="card"><h3>Where attention is needed</h3><div class="attention-item"><span class="status high">Priority</span><div><b>Roads & Engineering</b><div class="small">32 grievances at SLA risk · 86% compliance · 2.4 day average resolution</div></div></div><div class="attention-item"><span class="status open">Watch</span><div><b>Street Lighting</b><div class="small">89% SLA compliance with 14 cases approaching breach.</div></div></div></div>
+   <div class="card"><h3>Strong performers</h3><div class="attention-item"><span class="status done">Strong</span><div><b>Public Health</b><div class="small">96% SLA · 1.1 day resolution · 4.7/5 citizen rating.</div></div></div><div class="attention-item"><span class="status done">Strong</span><div><b>Solid Waste</b><div class="small">95% SLA · 1.2 day resolution · 4.6/5 citizen rating.</div></div></div></div>
+ </div>`);
+}
+function executiveCitizen(){return executiveDetail("Citizen Experience","Channels, satisfaction, response quality, feedback and reopened grievances.",`<div class="grid g4"><div class="card metric"><div class="label">Citizen satisfaction</div><div class="num">4.4/5</div></div><div class="card metric"><div class="label">Feedback response</div><div class="num">62%</div></div><div class="card metric"><div class="label">Reopened</div><div class="num">84</div></div><div class="card metric"><div class="label">Digital submissions</div><div class="num">78%</div></div><div class="card" style="grid-column:1/-1"><h3>Channel mix</h3><div class="case-row"><div><b>Mobile / Web</b></div><div class="bar"><i style="width:78%"></i></div><b>78%</b></div><div class="case-row"><div><b>WhatsApp</b></div><div class="bar"><i style="width:12%"></i></div><b>12%</b></div><div class="case-row"><div><b>Call centre / Walk-in</b></div><div class="bar"><i style="width:10%"></i></div><b>10%</b></div></div></div>`) }
+function header(title,sub,action=""){return `<div class="page-head"><div><div class="eyebrow">Thane Municipal Corporation</div><div class="title">${title}</div><div class="subtitle">${sub}</div></div>${action}</div>`}
+function openDepartmentScorecards(){
+  state.persona=5;
+  state.screen="departments";
+  render();
+}
+function dispatchExecutive(){if(state.screen==="performance")return executivePerformance();if(state.screen==="gis")return executiveGIS();if(state.screen==="departments")return executiveDepartments();if(state.screen==="citizen")return executiveCitizen();return executiveDashboard()}
+function patchExec(){const id=personas[state.persona].id;if(id==="executive")app.innerHTML=dispatchExecutive()}
+const oldRender=render;
+render=function(){
+ document.getElementById("steps").innerHTML=stepBar();
+ const id=personas[state.persona].id;
+ if(id==="citizen")app.innerHTML=citizenApp();
+ else if(id==="control")app.innerHTML=controlApp();
+ else if(id==="officer")app.innerHTML=officerApp();
+ else if(id==="field")app.innerHTML=state.screen==="detail"?fieldScreen():fieldApp();
+ else if(id==="resolution")app.innerHTML=resolutionApp();
+ else if(id==="executive")patchExec();
+}
+render();
+</script>
+
+<style>
+/* Intuitive demo refinement */
+:root{
+  --accent:#5b5bd6;--accent2:#3949ab;--bg:#f4f6fa;--ink:#182230;
+  --shadow:0 8px 28px rgba(18,30,52,.07);--radius:16px;
+}
+body{background:#f3f5f9}
+.demo-bar{
+  position:sticky;top:0;z-index:100;background:#111827;padding:10px 22px;
+  box-shadow:0 5px 20px rgba(0,0,0,.14)
+}
+.demo-inner{max-width:1480px}
+.brand-demo{font-size:12px;letter-spacing:.35px}
+.brand-demo span{color:#a5b4fc}
+.steps{gap:4px}
+.step{padding:7px 10px;border-radius:9px;font-size:11px}
+.step.active{background:#5b5bd6;border-color:#7376e6;box-shadow:0 2px 8px #0002}
+.step.done{background:#1f2937}
+.demo-actions button{border-radius:9px;padding:7px 11px}
+.app{max-width:1480px}
+.topbar{height:68px;padding:0 30px}
+.logo-mark{background:linear-gradient(135deg,#5b5bd6,#3949ab)}
+.sidebar{padding:18px 13px}
+.nav{cursor:pointer;transition:.15s}
+.nav:hover{background:#f5f6fa;color:#3949ab}
+.nav.active{background:#eef0ff;color:#4149b7}
+.content{max-width:1240px;padding:26px 30px 42px}
+.title{font-size:26px;letter-spacing:-.4px}
+.subtitle{line-height:1.5}
+.card{box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
+.card[onclick]{cursor:pointer}
+.card[onclick]:hover{transform:translateY(-1px);box-shadow:0 12px 32px rgba(18,30,52,.10)}
+.btn{transition:.15s}
+.btn:hover{transform:translateY(-1px)}
+.btn.primary{background:#4f46b8;border-color:#4f46b8}
+.metric .num{letter-spacing:-.7px}
+.case-row{transition:.12s}
+.case-row[onclick]:hover{background:#fafbff}
+.demo-guide{
+  max-width:1480px;margin:0 auto;padding:14px 30px 0;
+}
+.demo-guide-inner{
+  background:#fff;border:1px solid #dfe4ed;border-radius:14px;padding:13px 16px;
+  display:flex;align-items:center;justify-content:space-between;gap:18px;
+  box-shadow:0 5px 18px rgba(18,30,52,.05)
+}
+.demo-guide-copy{display:flex;align-items:center;gap:11px;min-width:0}
+.demo-guide-icon{
+  width:30px;height:30px;border-radius:9px;background:#eef0ff;color:#4f46b8;
+  display:grid;place-items:center;font-weight:900;flex:none
+}
+.demo-guide-kicker{font-size:10px;text-transform:uppercase;letter-spacing:.9px;color:#6b7280;font-weight:800}
+.demo-guide-title{font-weight:800;margin-top:2px}
+.demo-guide-hint{font-size:12px;color:#667085;margin-top:2px}
+.demo-guide-action{white-space:nowrap}
+.story-state{
+  display:flex;align-items:center;gap:7px;margin:0 0 16px;padding:9px 12px;
+  background:#f8f9fc;border:1px solid #e6e9ef;border-radius:11px;font-size:12px;color:#596273
+}
+.story-dot{width:7px;height:7px;border-radius:50%;background:#5b5bd6}
+.next-action{
+  border:1px solid #d9dcff;background:#f7f7ff;border-radius:13px;padding:13px 14px;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px
+}
+.next-action b{color:#31378f}.next-action .small{margin-top:3px}
+.case-status-strip{
+  display:flex;align-items:center;gap:0;overflow:auto;padding:10px 12px;margin-bottom:16px;
+  background:#fff;border:1px solid var(--line);border-radius:13px
+}
+.case-stage{display:flex;align-items:center;gap:7px;white-space:nowrap;color:#8a93a3;font-size:11px}
+.case-stage:not(:last-child):after{content:"→";margin:0 9px;color:#c5cad4}
+.case-stage.done{color:#08734f;font-weight:750}.case-stage.current{color:#4f46b8;font-weight:800}
+.stage-num{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:#edf0f4}
+.case-stage.done .stage-num{background:#e8f8f1}.case-stage.current .stage-num{background:#eeeaff}
+.action-emphasis{box-shadow:0 0 0 3px #5b5bd612}
+.mobile-shell{box-shadow:0 22px 55px rgba(18,30,52,.18)}
+.mobile-head{position:sticky;top:0;z-index:3}
+.mobile-bottom{backdrop-filter:blur(10px);background:#fffffff2}
+.mobile-action{background:#4f46b8;box-shadow:0 5px 12px #4f46b82b}
+.form-field{
+  border:1px solid #dfe4ec;border-radius:13px;background:#fff;padding:12px 13px;
+  width:100%;outline:none;transition:.15s
+}
+.form-field:focus{border-color:#7c83e8;box-shadow:0 0 0 3px #5b5bd615}
+.step-copy{font-size:10px;color:#8a93a3;margin-top:4px}
+.step-copy.active{color:#4f46b8;font-weight:800}
+.demo-legend{
+  display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:#697386;margin-top:8px
+}
+.demo-legend span{display:inline-flex;align-items:center;gap:5px}
+.legend-dot{width:7px;height:7px;border-radius:50%}
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(15,23,42,.48);z-index:500;
+  display:grid;place-items:center;padding:20px
+}
+.modal{
+  width:min(520px,100%);background:#fff;border-radius:18px;box-shadow:0 25px 80px #0004;
+  padding:22px
+}
+.modal h3{margin:0 0 7px;font-size:18px}
+.modal p{color:#667085;line-height:1.55}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+@media(max-width:900px){
+  .demo-guide{padding:10px 12px 0}
+  .demo-guide-inner{align-items:flex-start}
+  .content{padding:20px 16px 35px}
+}
+@media(max-width:600px){
+  .demo-guide-inner{flex-direction:column}
+  .demo-guide-action{width:100%}
+  .demo-guide-action .btn{width:100%}
+  .topbar{padding:0 16px}
+}
+</style>
+
+<script>
+/* ---- intuitive demo layer ---- */
+const demoCopy = [
+  {
+    title:"Start with the citizen experience",
+    hint:"Submit one realistic civic complaint. The same case will travel through every role.",
+    action:"Open complaint",
+    actionFn:"go(0,'report')"
+  },
+  {
+    title:"Triage the incoming grievance",
+    hint:"Review the AI + GIS recommendation, then route the case to the responsible department.",
+    action:"Open live case",
+    actionFn:"go(1,'case')"
+  },
+  {
+    title:"Manage the department response",
+    hint:"Accept the case, assign a field visit, verify evidence and submit the final resolution.",
+    action:"Open priority case",
+    actionFn:"go(2,'case')"
+  },
+  {
+    title:"Complete the field verification",
+    hint:"The ground team confirms the location and captures geo-tagged evidence.",
+    action:"Open field task",
+    actionFn:"go(3,'tasks')"
+  },
+  {
+    title:"Close the loop with the citizen",
+    hint:"Show the resolution evidence and collect citizen feedback.",
+    action:"View citizen update",
+    actionFn:"go(4,'feedback')"
+  },
+  {
+    title:"Finish with the governance view",
+    hint:"Drill from district-wide KPIs into service performance, hotspots and department scorecards.",
+    action:"Open command centre",
+    actionFn:"go(5,'dashboard')"
+  }
+];
+
+function demoGuide(){
+  const d=demoCopy[state.persona];
+  const progress=Math.round((state.persona/5)*100);
+  return `<div class="demo-guide">
+    <div class="demo-guide-inner">
+      <div class="demo-guide-copy">
+        <div class="demo-guide-icon">↗</div>
+        <div>
+          <div class="demo-guide-kicker">Guided demonstration · ${progress}% journey</div>
+          <div class="demo-guide-title">${d.title}</div>
+          <div class="demo-guide-hint">${d.hint}</div>
+        </div>
+      </div>
+      <button class="btn primary demo-guide-action" onclick="${d.actionFn}">${d.action} →</button>
+    </div>
+  </div>`;
+}
+
+function storyStrip(){
+  const labels=["Submitted","AI triaged","Department","Field verified","Resolved","Feedback"];
+  const current = state.resolved?4:state.verified?3:state.assigned?2:state.submitted?1:0;
+  return `<div class="case-status-strip">${labels.map((x,i)=>`
+    <div class="case-stage ${i<current?"done":i===current?"current":""}">
+      <span class="stage-num">${i<current?"✓":i+1}</span>${x}
+    </div>`).join("")}</div>`;
+}
+
+function contextualNext(){
+  const p=state.persona, s=state.screen;
+  let title="",desc="",fn="",label="";
+  if(p===0 && s==="home"){title="Begin the story";desc="Create the shared grievance that the officials will follow.";fn="go(0,'report')";label="Report an issue"}
+  else if(p===0 && s==="report"){title="Complete the citizen submission";desc=`You are on step ${state.complaintStep} of 2. Enter the details once, review, then submit.`;fn="complaintNext()";label=state.complaintStep===2?"Submit grievance":"Review complaint"}
+  else if(p===1 && !state.assigned){title="Route the case";desc="The AI has already identified the likely department and jurisdiction.";fn="assignFromControl()";label="Assign to department"}
+  else if(p===2 && !state.verified){title="Send the case to the field";desc="A field visit creates the evidence needed before closure.";fn="assignFieldFromOfficer()";label="Assign field team"}
+  else if(p===2 && state.verified && !state.resolved){title="Close the service loop";desc="Review the field evidence and submit the resolution.";fn="resolveFromOfficer()";label="Submit resolution"}
+  else if(p===3){
+    if(s==="tasks"){title="Start the priority field task";desc="Open the assigned ticket and go straight to the job.";fn="fieldDetail()";label="Open task"}
+    else if(s==="detail" && state.fieldStep<=1){title="Go to the reported location";desc="Navigate to site and confirm arrival once you are there.";fn="goToFieldLocation()";label="Navigate to site"}
+    else if(s==="detail" && state.fieldStep===2){title="Complete the job";desc="Record the outcome and add the required site photo in one place.";fn="markFieldWork('Repair completed')";label="Record work"}
+    else if(s==="detail" && state.fieldStep===3){title="Submit the field update";desc="Review the captured evidence and send the update to the officer.";fn="goFieldSubmit()";label="Review & submit"}
+  }
+  else if(p===4 && state.resolved){title="Capture citizen feedback";desc="Rate the completed service to close the loop.";fn="rate(5)";label=state.rating?"Feedback recorded":"Rate 5 ★"}
+  else if(p===5){return ""}
+  else return "";
+  return `<div class="next-action"><div><b>${title}</b><div class="small">${desc}</div></div><button class="btn primary action-emphasis" onclick="${fn}">${label} →</button></div>`;
+}
+
+function contextHeader(title,sub){
+  return header(title,sub)+storyStrip()+contextualNext();
+}
+
+/* Make the demo journey the primary frame and keep the product UI visually separate. */
+const baseRender = render;
+render = function(){
+  document.getElementById("steps").innerHTML=stepBar();
+  const id=personas[state.persona].id;
+  if(id==="citizen") app.innerHTML=demoGuide()+citizenApp();
+  if(id==="control") app.innerHTML=demoGuide()+controlApp();
+  if(id==="officer") app.innerHTML=demoGuide()+officerApp();
+  if(id==="field") app.innerHTML=demoGuide()+fieldApp();
+  if(id==="resolution") app.innerHTML=demoGuide()+resolutionApp();
+  if(id==="executive") app.innerHTML=demoGuide()+executiveApp();
+}
+
+/* Richer citizen intake: the progress indicator is clearly an in-app workflow, not the demo guide. */
+const originalCitizenReport = citizenReport;
+citizenReport = function(){
+  const result = originalCitizenReport();
+  return result.replace(
+    `<div style="display:flex;gap:5px;margin-bottom:15px">`,
+    `<div class="card" style="padding:11px 12px;margin-bottom:12px;background:#fbfcfe"><div class="small"><b>Complaint intake</b> · Your progress is saved as you move through the form.</div></div><div style="display:flex;gap:5px;margin-bottom:15px">`
+  ).replace(/<div class="small">Step \d of 5<\/div>/g,
+    `<div class="small"><b>Complaint intake</b></div>`
+  );
+};
+
+/* Replace the generic desktop headings with a more obvious case journey where appropriate. */
+const oldControlDashboard = controlDashboard;
+controlDashboard = function(){
+  return header("Grievance Control Room","Central triage, routing, SLA and escalation workspace.",`<button class="btn primary" onclick="go(1,'case')">Open live case</button>`)
+    + storyStrip()
+    + contextualNext()
+    + oldControlDashboard().replace(/^.*?(?=<div class="grid g4">)/s,"");
+};
+
+const oldControlCase = controlCase;
+controlCase = function(){
+  return oldControlCase().replace(
+    `<div class="grid g3">`,
+    `${storyStrip()}${contextualNext()}<div class="grid g3">`
+  );
+};
+
+const oldOfficerDashboard = officerDashboard;
+officerDashboard = function(){
+  return oldOfficerDashboard().replace(
+    `<div class="grid g4">`,
+    `${storyStrip()}${contextualNext()}<div class="grid g4">`
+  );
+};
+
+const oldOfficerCase = officerCase;
+officerCase = function(){
+  return oldOfficerCase().replace(
+    `<div class="card">`,
+    `${storyStrip()}${contextualNext()}<div class="card">`
+  );
+};
+
+const oldFieldApp = fieldApp;
+fieldApp = function(){
+  return oldFieldApp().replace(
+    `<div class="small">Ground Operations</div>`,
+    `<div class="small">GROUND OPERATIONS · ${state.verified?"VERIFIED":"ACTION REQUIRED"}</div>${storyStrip()}${contextualNext()}`
+  );
+};
+
+const oldResolutionApp = resolutionApp;
+resolutionApp = function(){
+  return oldResolutionApp().replace(
+    `<div class="small">Grievance update</div>`,
+    `${storyStrip()}<div class="small">CITIZEN UPDATE</div>`
+  );
+};
+
+const oldExecutiveDashboard = executiveDashboard;
+executiveDashboard = function(){
+  /* Executive view is governance-level; no ticket-specific stepper or next-action card. */
+  return oldExecutiveDashboard();
+};
+
+/* More explicit state changes for demo confidence. */
+assignFromControl = function(){
+  state.assigned=true; state.caseStatus="Assigned"; state.persona=2; state.screen="case";
+  render(); notify("✓ Case routed to Roads / Engineering");
+};
+assignFieldFromOfficer = function(){
+  state.assigned=true; state.caseStatus="Field Visit"; state.persona=3; state.screen="tasks";
+  render(); notify("✓ Field task assigned to ground team");
+};
+captureEvidence = function(){
+  state.verified=true; state.caseStatus="Field Verified"; state.persona=2; state.screen="case";
+  render(); notify("✓ Geo-tagged field evidence captured");
+};
+resolveFromOfficer = function(){
+  state.resolved=true; state.caseStatus="Resolved"; state.persona=4; state.screen="feedback";
+  render(); notify("✓ Resolution submitted · citizen notified");
+};
+
+/* Make the demo controls themselves explain their purpose. */
+const originalStepBar = stepBar;
+stepBar = function(){
+  const labels=["01 Citizen","02 Control Room","03 Officer","04 Ground Team","05 Citizen","06 Mayor / Admin"];
+  return labels.map((x,i)=>`<button title="${demoCopy[i].title}" class="step ${i===state.persona?"active":i<state.persona?"done":""}" onclick="go(${i})">${x}</button>`).join("");
+};
+
+/* Initial render after overrides. */
+render();
+</script>
+
+
+<script>
+/* Ground-team interaction refinement: explicit field evidence workflow */
+state.fieldStep = state.fieldStep || 1;
+state.evidenceAdded = state.evidenceAdded || false;
+state.commentsAdded = state.commentsAdded || false;
+state.fieldComment = state.fieldComment || "";
+
+function resetFieldState(){
+  state.fieldStep=1;
+  state.evidenceAdded=false;
+  state.commentsAdded=false;
+  state.fieldComment="";
+  state.workCompleted=false;
+}
+
+function fieldApp(){
+  if(!state.fieldStep) resetFieldState();
+
+  if(state.screen==="detail"){
+    return fieldScreen();
+  }
+
+  return mobile(`
+    <div class="small">GROUND OPERATIONS</div>
+    <h2 style="margin:4px 0 5px">My assigned tickets</h2>
+    <div class="small">Today's route · 3 assigned tickets · 1 priority visit</div>
+
+    <div class="card action-emphasis" style="margin-top:14px" onclick="fieldDetail()">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <span class="status high">HIGH PRIORITY</span>
+          <h3 style="margin:9px 0 3px">CGMS-2026-10482</h3>
+          <div class="small">Pothole near ZP School, Thane West</div>
+        </div>
+        <span style="font-size:20px">›</span>
+      </div>
+      <div class="grid g2" style="margin-top:12px">
+        <div><div class="small">SLA</div><b>Today · 5:00 PM</b></div>
+        <div><div class="small">Department</div><b>Roads & Engineering</b></div>
+      </div>
+      <button class="mobile-action" style="margin-top:12px" onclick="event.stopPropagation();fieldDetail()">Open ticket →</button>
+    </div>
+
+    <div class="card" style="margin-top:10px;opacity:.72">
+      <div style="display:flex;justify-content:space-between"><b>CGMS-2026-10471</b><span class="status progress">Scheduled</span></div>
+      <div class="small" style="margin-top:5px">Streetlight issue · Wagle Estate</div>
+    </div>
+    <div class="card" style="margin-top:10px;opacity:.72">
+      <div style="display:flex;justify-content:space-between"><b>CGMS-2026-10465</b><span class="status progress">Scheduled</span></div>
+      <div class="small" style="margin-top:5px">Drainage blockage · Kopri</div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <b>Today's progress</b>
+      <div class="bar" style="margin-top:9px"><i style="width:${state.verified?100:8}%"></i></div>
+      <div class="small" style="margin-top:7px">${state.verified?"1 ticket submitted for resolution":"Open a ticket to begin the field workflow."}</div>
+    </div>
+  `);
+}
+
+function fieldDetail(){
+  state.screen="detail";
+  if(!state.fieldStep) resetFieldState();
+  render();
+}
+
+function fieldWorkflowHeader(){
+  const labels=["Ticket","Location","Work","Evidence","Submit"];
+  return `<div class="card" style="padding:11px 10px;margin-bottom:12px">
+    <div style="display:flex;gap:5px">
+      ${labels.map((x,i)=>{
+        const n=i+1, active=state.fieldStep===n, done=state.fieldStep>n;
+        return `<div style="flex:1;text-align:center">
+          <div style="height:5px;border-radius:5px;background:${done||active?"#5b5bd6":"#e7eaf0"}"></div>
+          <div class="step-copy ${active?"active":""}" style="margin-top:5px">${done?"✓ ":""}${x}</div>
+        </div>`;
+      }).join("")}
+    </div>
+  </div>`;
+}
+
+function fieldScreen(){
+  if(state.fieldStep===1){
+    return mobile(`
+      <div class="small">FIELD TASK · 01</div>
+      <h2 style="margin:4px 0 4px">Ticket details</h2>
+      <div class="small">Review the assignment before heading to site.</div>
+      ${fieldWorkflowHeader()}
+      <div class="card">
+        <span class="status high">HIGH PRIORITY</span>
+        <h3 style="margin:9px 0 3px">CGMS-2026-10482</h3>
+        <div class="small">Road damage / pothole</div>
+        <hr style="border:0;border-top:1px solid #eee;margin:12px 0">
+        <div class="small">Reported by</div><b>Citizen · Thane West</b>
+        <div class="small" style="margin-top:10px">Reported location</div><b>Near ZP School, Thane West</b>
+        <div class="small" style="margin-top:10px">Citizen description</div>
+        <div style="font-size:13px;line-height:1.45;margin-top:4px">Large pothole on the main road, dangerous for two-wheelers at night.</div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="small">Assignment</div>
+        <b>Roads & Engineering</b>
+        <div class="small" style="margin-top:4px">SLA: Today · 5:00 PM</div>
+      </div>
+      <button class="mobile-action" style="margin-top:12px" onclick="goToFieldLocation()">Go to location →</button>
+    `);
+  }
+
+  if(state.fieldStep===2){
+    return mobile(`
+      <div class="small">FIELD TASK · 02</div>
+      <h2 style="margin:4px 0 4px">Go to the location</h2>
+      <div class="small">Navigate to the reported site and confirm you have arrived.</div>
+      ${fieldWorkflowHeader()}
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><b>📍 Reported location</b><div class="small">Near ZP School, Thane West</div></div>
+          <span class="status progress">18 m away</span>
+        </div>
+        <div class="map" style="height:205px;margin-top:12px"><i class="pin p2"></i></div>
+        <div class="grid g2" style="margin-top:10px">
+          <button class="btn" onclick="notify('Navigation opened in demo')">⌖ Navigate</button>
+          <button class="btn" onclick="verifyFieldLocation()">✓ I am here</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <div class="small">Location verification</div>
+        <b>AI match: within 18 m of citizen's reported pin</b>
+        <div class="small" style="margin-top:4px">GPS is recorded with the field report.</div>
+      </div>
+    `);
+  }
+
+  if(state.fieldStep===3){
+    return mobile(`
+      <div class="small">FIELD TASK · 03</div>
+      <h2 style="margin:4px 0 4px">Do the field work</h2>
+      <div class="small">Inspect the issue and record what you did before adding evidence.</div>
+      ${fieldWorkflowHeader()}
+      <div class="card">
+        <span class="status progress">ON SITE</span>
+        <h3 style="margin:9px 0 4px">Pothole inspection & temporary action</h3>
+        <div class="small">Reported issue: road surface damage near the school gate.</div>
+        <div class="grid g2" style="margin-top:12px">
+          <button class="btn" onclick="markFieldWork('Inspected site')">✓ Inspect site</button>
+          <button class="btn" onclick="markFieldWork('Temporary barricading placed')">＋ Mark temporary action</button>
+        </div>
+        ${state.workCompleted?`
+          <div class="success-box" style="margin-top:11px">
+            <b>✓ Field work recorded</b><br>
+            <span class="small">${esc(state.workNote||"Site inspected and temporary action recorded.")}</span>
+          </div>
+          <button class="mobile-action" style="margin-top:12px" onclick="goFieldEvidence()">Upload evidence →</button>
+        `:`<div class="small" style="margin-top:10px">Complete at least one field action to continue.</div>`}
+      </div>
+    `);
+  }
+
+  if(state.fieldStep===4){
+    return mobile(`
+      <div class="small">FIELD TASK · 04</div>
+      <h2 style="margin:4px 0 4px">Upload evidence</h2>
+      <div class="small">Attach photos showing the issue and the work completed.</div>
+      ${fieldWorkflowHeader()}
+      <div class="card">
+        <div class="upload action-emphasis" onclick="captureFieldPhoto()">
+          📷<br><b>Capture site photo</b><br>
+          <span class="small">Camera · GPS tag · timestamp</span>
+        </div>
+        ${state.evidenceAdded?`
+          <div class="card" style="margin-top:10px;background:#f7fbf9;border-color:#cde9dc">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <b>✓ Photo 01 attached</b><span class="status done">GPS matched</span>
+            </div>
+            <div class="photo" style="height:105px;margin-top:9px;background:linear-gradient(145deg,#64748b,#cbd5e1 50%,#475569)"></div>
+            <div class="small" style="margin-top:6px">Captured 2:38 PM · 18 m GPS match · 3.2 MB</div>
+          </div>
+          <div class="grid g2" style="margin-top:10px">
+            <button class="btn" onclick="captureFieldPhoto()">＋ Add another</button>
+            <button class="btn" onclick="removeFieldPhoto()">Remove</button>
+          </div>
+          <button class="mobile-action" style="margin-top:12px" onclick="goFieldSubmit()">Continue →</button>
+        `:`<div class="small" style="margin-top:9px">At least one photo is required before submitting the field report.</div>`}
+      </div>
+    `);
+  }
+
+  return mobile(`
+    <div class="small">FIELD TASK · 05</div>
+    <h2 style="margin:4px 0 4px">Submit for resolution</h2>
+    <div class="small">Review the field report and send it to the department officer.</div>
+    ${fieldWorkflowHeader()}
+    <div class="card">
+      <div style="display:flex;justify-content:space-between"><b>Ready to submit</b><span class="status done">Complete</span></div>
+      <hr style="border:0;border-top:1px solid #eee;margin:12px 0">
+      <div class="small">Ticket</div><b>CGMS-2026-10482</b>
+      <div class="small" style="margin-top:10px">Location</div><b>✓ GPS verified · 18 m match</b>
+      <div class="small" style="margin-top:10px">Field work</div><b>✓ ${esc(state.workNote||"Site inspected")}</b>
+      <div class="small" style="margin-top:10px">Evidence</div><b>✓ 1 geo-tagged photo attached</b>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <label class="small"><b>Optional field note</b></label>
+      <textarea id="fieldComment" class="form-field" style="height:90px;margin-top:7px;resize:none" placeholder="Add a short note for the officer...">${esc(state.fieldComment)}</textarea>
+    </div>
+    <button class="mobile-action" style="margin-top:12px" onclick="submitFieldReport()">Submit for resolution ✓</button>
+  `);
+}
+
+function goToFieldLocation(){
+  state.fieldStep=2;
+  state.caseStatus="Assigned to ground team";
+  render();
+}
+function verifyFieldLocation(){
+  state.fieldStep=3;
+  state.caseStatus="Field visit in progress";
+  render();
+  notify("✓ Arrival and GPS location verified");
+}
+function markFieldWork(note){
+  state.workCompleted=true;
+  state.workNote=note;
+  state.caseStatus="Work completed on site";
+  render();
+  notify("✓ Field action recorded");
+}
+function goFieldEvidence(){
+  if(!state.workCompleted){notify("Complete the field work first");return}
+  state.fieldStep=4;
+  render();
+}
+function captureFieldPhoto(){
+  state.evidenceAdded=true;
+  state.caseStatus="Evidence captured";
+  render();
+  notify("✓ Photo attached with GPS + timestamp");
+}
+function removeFieldPhoto(){
+  state.evidenceAdded=false;
+  render();
+  notify("Photo removed");
+}
+function goFieldSubmit(){
+  if(!state.evidenceAdded){notify("Add at least one photo first");return}
+  state.fieldStep=5;
+  render();
+}
+function submitFieldReport(){
+  const el=document.getElementById("fieldComment");
+  if(el) state.fieldComment=el.value.trim();
+  if(!state.evidenceAdded){notify("Evidence is required");return}
+  if(!state.workCompleted){notify("Field work must be recorded");return}
+  state.verified=true;
+  state.caseStatus="Field Verified";
+  state.fieldStep=5;
+  state.persona=2;
+  state.screen="case";
+  render();
+  notify("✓ Field report submitted to Roads & Engineering");
+}
+
+/* Keep the field-team contextual guide aligned with the actual workflow. */
+contextualNext = function(){
+  const p=state.persona, s=state.screen;
+  if(p===0 && s==="report"){
+    return `<div class="next-action"><div><b>Next: ${state.complaintStep===1?"Enter details":"Submit complaint"}</b><div class="small">${state.complaintStep===1?"Add the issue, department, photo and location in one screen.":"Review the complete complaint, then submit it to TMC."}</div></div><button class="btn primary action-emphasis" onclick="${state.complaintStep===1?"complaintNext()":"submitComplaint()"}">${state.complaintStep===1?"Review complaint →":"Submit grievance ✓"}</button></div>`;
+  }
+  if(p!==3) return "";
+  if(s==="tasks") return `<div class="next-action"><div><b>Next: open the assigned ticket</b><div class="small">Review the complaint details and begin the field visit.</div></div><button class="btn primary action-emphasis" onclick="fieldDetail()">Open ticket →</button></div>`;
+  if(s==="detail"){
+    const labels={
+      1:["Go to location","Review the ticket, then navigate to the reported site.","goToFieldLocation()"],
+      2:["Confirm arrival","Navigate to the location and confirm you are there.","verifyFieldLocation()"],
+      3:["Do field work","Inspect the issue and record the work performed.","markFieldWork('Inspected site')"],
+      4:["Upload evidence","Attach at least one geo-tagged photo.","captureFieldPhoto()"],
+      5:["Submit for resolution","Send the completed field report to the department officer.","submitFieldReport()"]
+    };
+    const x=labels[state.fieldStep]||labels[1];
+    return `<div class="next-action"><div><b>Next: ${x[0]}</b><div class="small">${x[1]}</div></div><button class="btn primary action-emphasis" onclick="${x[2]}">${x[0]} →</button></div>`;
+  }
+  return "";
+};
+
+render();
+</script>
+
+
+<script id="final-resolution-override">
+/* Final resolution confirmation: placed last so no earlier prototype override can bypass it. */
+const _officerCaseFinalBase = officerCase;
+officerCase = function(){
+  const base = _officerCaseFinalBase();
+  return base + (state.resolutionConfirmOpen ? resolutionConfirmModal() : "");
+};
+
+resolveFromOfficer = function(){
+  state.resolutionConfirmOpen = true;
+  render();
+};
+
+function resolutionConfirmModal(){
+  return `<div class="assignment-overlay" onclick="if(event.target===this)closeResolutionConfirm()">
+    <div class="assignment-modal resolution-modal">
+      <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start">
+        <div>
+          <div class="eyebrow">DEPARTMENT OFFICER · FINAL ACTION</div>
+          <h2 style="margin:5px 0 4px;color:#101828">Confirm resolution</h2>
+          <div class="small">CGMS-2026-10482 · Road damage near ZP School</div>
+        </div>
+        <button class="btn" onclick="closeResolutionConfirm()">✕</button>
+      </div>
+
+      <div class="alert" style="margin-top:18px">
+        <b>Are you sure you want to resolve this grievance?</b><br>
+        <span class="small">Once submitted, the case will be marked resolved and the citizen will be notified.</span>
+      </div>
+
+      <div class="card" style="margin-top:14px;background:#f8fafc;box-shadow:none">
+        <b>Before you continue, make sure everything is checked:</b>
+        <div style="display:grid;gap:11px;margin-top:12px">
+          <label style="display:flex;gap:9px;align-items:flex-start;color:#172033">
+            <input type="checkbox" id="resolveCheck1">
+            <span><b>Field evidence reviewed</b><br><span class="small">Photo, GPS verification and field note are satisfactory.</span></span>
+          </label>
+          <label style="display:flex;gap:9px;align-items:flex-start;color:#172033">
+            <input type="checkbox" id="resolveCheck2">
+            <span><b>Work completion verified</b><br><span class="small">The reported issue has been addressed or the recorded action is sufficient.</span></span>
+          </label>
+          <label style="display:flex;gap:9px;align-items:flex-start;color:#172033">
+            <input type="checkbox" id="resolveCheck3">
+            <span><b>Citizen notification understood</b><br><span class="small">The citizen will receive the resolution update after submission.</span></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="grid g2" style="margin-top:16px">
+        <button class="btn" onclick="closeResolutionConfirm()">Cancel</button>
+        <button class="btn success" onclick="confirmResolutionWithChecks()">Confirm & resolve ✓</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function closeResolutionConfirm(){
+  state.resolutionConfirmOpen=false;
+  render();
+}
+
+function confirmResolutionWithChecks(){
+  const ids=["resolveCheck1","resolveCheck2","resolveCheck3"];
+  if(!ids.every(id=>document.getElementById(id)?.checked)){
+    notify("Please confirm all three checks before resolving");
+    return;
+  }
+  state.resolutionConfirmOpen=false;
+  state.resolved=true;
+  state.caseStatus="Resolved";
+  state.notification=true;
+  state.persona=4;
+  state.screen="feedback";
+  render();
+  notify("✓ Resolution submitted · Citizen notified");
+}
+
+render();
+</script>
+
+
+<script id="ground-team-final-ux">
+/*
+ Final Ground Team field UX:
+ 1. Assigned ticket
+ 2. Navigate + arrival confirmation in the same screen
+ 3. Work outcome + photo + note in one screen
+ 4. Review + submit
+*/
+function fieldApp(){
+  const ticket = `
+    <div class="mobile-kicker">TODAY · 1 PRIORITY TASK</div>
+    <div class="field-ticket-card">
+      <div class="field-ticket-top">
+        <div>
+          <div class="small">CGMS-2026-10482 · ROADS & ENGINEERING</div>
+          <h2>Road damage near ZP School</h2>
+        </div>
+        <span class="status high">HIGH</span>
+      </div>
+      <div class="field-ticket-meta">
+        <span>⏱ SLA today, 5:00 PM</span>
+        <span>📍 Thane West</span>
+        <span>👥 Roads Crew · West 02</span>
+      </div>
+      <div class="field-mini-map"><i class="pin p2"></i><div class="field-map-label">1.2 km · ~5 min</div></div>
+      <button class="mobile-action" onclick="fieldDetail()">Open task →</button>
+    </div>
+    <div class="field-secondary">
+      <div class="small">LATER TODAY</div>
+      <div class="field-list-row"><b>Water leakage · Naupada</b><span class="small">SLA 7:00 PM</span></div>
+      <div class="field-list-row"><b>Streetlight outage · Kopri</b><span class="small">SLA tomorrow</span></div>
+    </div>`;
+  return mobile(ticket);
+}
+
+function fieldDetail(){
+  state.screen="detail";
+  state.fieldStep=state.fieldStep || 1;
+  render();
+}
+
+function fieldScreen(){
+  if(state.fieldStep<=1){
+    return mobile(`
+      <div class="field-screen-head">
+        <button class="btn" onclick="state.screen='tasks';render()">← Back</button>
+        <span class="status high">HIGH · SLA 5:00 PM</span>
+      </div>
+      <div class="mobile-kicker">STEP 1 · GET TO SITE</div>
+      <h2 style="margin:5px 0 6px">Road damage near ZP School</h2>
+      <div class="small">CGMS-2026-10482 · Roads & Engineering</div>
+
+      <div class="card field-brief-card">
+        <b>What was reported</b>
+        <p class="small" style="margin:6px 0 0">Large pothole near the school entrance, creating a safety risk for two-wheelers.</p>
+      </div>
+
+      <div class="field-map-large">
+        <i class="pin p2"></i>
+        <div class="field-map-label">Reported location · Thane West</div>
+      </div>
+
+      <div class="field-action-stack">
+        <button class="mobile-action" onclick="goToFieldLocation()">Navigate · 1.2 km →</button>
+        <button class="btn" onclick="verifyFieldLocation()">I'm at the location</button>
+      </div>
+      ${state.fieldLocationStarted ? `<div class="success-box"><b>✓ Navigation started</b><br><span class="small">Confirm arrival when you reach the reported location.</span></div>` : ""}
+    `);
+  }
+
+  if(state.fieldStep===2){
+    return mobile(`
+      <div class="field-screen-head">
+        <button class="btn" onclick="state.fieldStep=1;render()">← Location</button>
+        <span class="status progress">ON SITE</span>
+      </div>
+      <div class="mobile-kicker">STEP 2 · DO THE WORK</div>
+      <h2 style="margin:5px 0 6px">Record field action</h2>
+      <div class="success-box"><b>✓ GPS location confirmed</b><br><span class="small">Arrival captured automatically at 2:18 PM.</span></div>
+
+      <div class="card field-work-card">
+        <b>What did you find?</b>
+        <div class="field-choice-grid">
+          <button class="field-choice ${state.fieldOutcome==='completed'?'selected':''}" onclick="state.fieldOutcome='completed';render()">✓<span>Work completed</span></button>
+          <button class="field-choice ${state.fieldOutcome==='temporary'?'selected':''}" onclick="state.fieldOutcome='temporary';render()">⚠<span>Temporary action</span></button>
+          <button class="field-choice ${state.fieldOutcome==='inspection'?'selected':''}" onclick="state.fieldOutcome='inspection';render()">⌕<span>Inspection only</span></button>
+        </div>
+
+        <div class="field-evidence-row">
+          ${state.evidenceAdded ? `
+            <div class="field-photo-preview"><span>✓</span><div><b>Site photo added</b><div class="small">GPS + timestamp captured</div></div><button class="btn" onclick="removeFieldPhoto()">Remove</button></div>
+          ` : `
+            <button class="field-add-photo" onclick="captureFieldPhoto()">📷 <span><b>Add site photo</b><small>Required for resolution</small></span><strong>+</strong></button>
+          `}
+        </div>
+
+        <textarea class="field-note" placeholder="Optional: add a short field note…" oninput="state.fieldComment=this.value">${state.fieldComment||""}</textarea>
+      </div>
+
+      <button class="mobile-action" ${(!state.fieldOutcome || !state.evidenceAdded)?'disabled':''} onclick="goFieldSubmit()">Review update →</button>
+      <div class="small field-required-note">${!state.fieldOutcome?'Choose the field outcome.':(!state.evidenceAdded?'Add one site photo to continue.':'Ready to review.')}</div>
+    `);
+  }
+
+  return mobile(`
+    <div class="field-screen-head">
+      <button class="btn" onclick="state.fieldStep=2;render()">← Edit</button>
+      <span class="status done">READY</span>
+    </div>
+    <div class="mobile-kicker">FINAL CHECK</div>
+    <h2 style="margin:5px 0 6px">Send field update?</h2>
+    <div class="small">The Department Officer will review this update before the grievance is closed.</div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="review-line"><span>Location</span><b>✓ GPS verified</b></div>
+      <div class="review-line"><span>Outcome</span><b>${state.fieldOutcome==='completed'?'Work completed':state.fieldOutcome==='temporary'?'Temporary action':'Inspection only'}</b></div>
+      <div class="review-line"><span>Evidence</span><b>✓ 1 site photo</b></div>
+      <div class="review-line"><span>Field note</span><b>${state.fieldComment?'Added':'None'}</b></div>
+    </div>
+
+    <div class="field-final-note">Once submitted, the ticket returns to the Department Officer for review.</div>
+    <button class="mobile-action" onclick="submitFieldReport()">Submit field update ✓</button>
+  `);
+}
+
+function goToFieldLocation(){
+  state.fieldLocationStarted=true;
+  render();
+  notify("Navigation started · 1.2 km to reported location");
+}
+
+function verifyFieldLocation(){
+  state.verified=true;
+  state.fieldStep=2;
+  state.caseStatus="On Site";
+  state.fieldLocationStarted=false;
+  render();
+  notify("✓ GPS location confirmed");
+}
+
+function captureFieldPhoto(){
+  state.evidenceAdded=true;
+  render();
+  notify("✓ Site photo captured with GPS and timestamp");
+}
+
+function removeFieldPhoto(){
+  state.evidenceAdded=false;
+  render();
+}
+
+function goFieldSubmit(){
+  if(!state.fieldOutcome || !state.evidenceAdded){
+    notify("Select an outcome and add the site photo first");
+    return;
+  }
+  state.fieldStep=3;
+  render();
+}
+
+function submitFieldReport(){
+  state.commentsAdded=!!state.fieldComment;
+  state.workCompleted=state.fieldOutcome==='completed';
+  state.caseStatus="Field Verified";
+  state.verified=true;
+  state.persona=2;
+  state.screen="case";
+  render();
+  notify("✓ Field update submitted · Officer notified");
+}
+</script>
+<style id="ground-team-final-ux-style">
+.field-ticket-card{background:#fff;border:1px solid #dfe4ea;border-radius:18px;padding:16px;box-shadow:0 8px 24px rgba(16,24,40,.07)}
+.field-ticket-top{display:flex;justify-content:space-between;gap:10px}
+.field-ticket-top h2{font-size:19px;margin:5px 0;color:#101828}
+.field-ticket-meta{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;color:#344054;font-size:12px;font-weight:600}
+.field-mini-map,.field-map-large{position:relative;overflow:hidden;background:linear-gradient(135deg,#eef2f7,#dce6ee);border:1px solid #d0d8e2;border-radius:14px}
+.field-mini-map{height:145px}
+.field-map-large{height:255px;margin-top:14px}
+.field-map-label{position:absolute;left:10px;bottom:10px;background:#fff;color:#172033;border:1px solid #d8dee8;border-radius:9px;padding:7px 9px;font-size:11px;font-weight:700}
+.field-secondary{margin-top:16px}
+.field-list-row{display:flex;justify-content:space-between;gap:10px;padding:13px 0;border-bottom:1px solid #e5e7eb;color:#172033}
+.field-screen-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.field-brief-card{margin-top:14px;box-shadow:none}
+.field-action-stack{display:grid;gap:9px;margin-top:12px}
+.field-work-card{margin-top:14px}
+.field-choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:11px}
+.field-choice{border:1px solid #d0d5dd;background:#fff;border-radius:12px;padding:11px 7px;color:#172033;font-weight:800;cursor:pointer}
+.field-choice span{display:block;font-size:11px;margin-top:5px}
+.field-choice.selected{border-color:#5b21b6;background:#f5f3ff;box-shadow:0 0 0 2px rgba(91,33,182,.1)}
+.field-evidence-row{margin-top:12px}
+.field-add-photo,.field-photo-preview{width:100%;display:flex;align-items:center;gap:10px;border:1px dashed #98a2b3;border-radius:12px;background:#f8fafc;padding:12px;color:#172033;text-align:left}
+.field-add-photo span{display:grid;gap:2px;flex:1}
+.field-add-photo small{font-weight:500;color:#475467}
+.field-add-photo strong{font-size:22px}
+.field-photo-preview span{font-size:18px;color:#067647}
+.field-photo-preview>div{flex:1}
+.field-note,.field-work-card textarea{width:100%;min-height:72px;margin-top:10px;border:1px solid #b8c0cc;border-radius:10px;padding:10px;font:inherit;color:#172033;resize:vertical}
+.field-note::placeholder{color:#667085}
+.field-required-note{display:block;margin-top:7px;text-align:center;color:#475467}
+.field-final-note{margin:12px 0;padding:11px 12px;border-radius:10px;background:#f8fafc;color:#344054;font-size:12px}
+.review-line{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #eaecf0;color:#344054}
+.review-line:last-child{border-bottom:0}
+.review-line b{color:#101828}
+.mobile-action:disabled{opacity:.45;cursor:not-allowed}
+@media(max-width:520px){
+  .field-choice-grid{grid-template-columns:1fr}
+  .field-choice{text-align:left;display:flex;align-items:center;gap:8px}
+  .field-choice span{display:inline;margin:0}
+}
+</style>
+
+</body>
+</html>
+<style id="mobile-scroll-fix">
+/* Mobile persona: the application itself scrolls; the demo shell remains stable. */
+.mobile-shell,
+.mobile-frame,
+.phone,
+.phone-frame,
+.mobile-app,
+[class*="mobile"] {
+  -webkit-overflow-scrolling: touch;
+}
+.mobile-shell { overflow-y:auto !important; max-height:calc(100vh - 170px) !important; }
+@media (max-width: 900px) {
+  body { overflow:auto !important; }
+  .app { min-height:100vh !important; }
+  .mobile-shell { max-height:none !important; min-height:calc(100vh - 150px) !important; overflow-y:visible !important; }
+  .mobile-content { padding-bottom:110px !important; }
+  .mobile-action { position:relative; z-index:3; margin-bottom:10px !important; }
+}
+</style>
+<script>
+/* Ensure mobile content always has enough bottom breathing room for the primary CTA. */
+(function(){
+  const oldRender = window.render;
+  if(typeof oldRender === "function"){
+    window.render = function(){
+      oldRender();
+      requestAnimationFrame(()=>{
+        document.querySelectorAll('.mobile-shell,.mobile-frame,.phone,.phone-frame').forEach(el=>{
+          el.style.overflowY='auto';
+          el.style.webkitOverflowScrolling='touch';
+        });
+      });
+    };
+  }
+})();
+</script>
+
+<script id="ground-team-compact">
+(function(){
+  window.groundCompact = true;
+
+  window.fieldWorkflowHeader = function(){
+    const labels=["Ticket","Visit","Work + evidence","Submit"];
+    return `<div class="card" style="padding:11px 10px;margin-bottom:12px">
+      <div style="display:flex;gap:5px">
+        ${labels.map((x,i)=>{
+          const n=i+1, active=state.fieldStep===n, done=state.fieldStep>n;
+          return `<div style="flex:1;text-align:center">
+            <div style="height:5px;border-radius:5px;background:${done||active?"#5b5bd6":"#e7eaf0"}"></div>
+            <div class="step-copy ${active?"active":""}" style="margin-top:5px">${done?"✓ ":""}${x}</div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>`;
+  };
+
+  window.fieldApp = function(){
+    if(!state.fieldStep) state.fieldStep=1;
+    if(state.screen==="detail") return fieldScreen();
+
+    return mobile(`
+      <div class="small">GROUND OPERATIONS</div>
+      <h2 style="margin:4px 0 5px">My assigned tickets</h2>
+      <div class="small">3 assigned · 1 priority visit</div>
+
+      <div class="card action-emphasis" style="margin-top:14px" onclick="fieldDetail()">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <span class="status high">HIGH PRIORITY</span>
+            <h3 style="margin:9px 0 3px">CGMS-2026-10482</h3>
+            <div class="small">Pothole · Near ZP School, Thane West</div>
+          </div>
+          <span style="font-size:20px">›</span>
+        </div>
+        <div class="grid g2" style="margin-top:12px">
+          <div><div class="small">SLA</div><b>Today · 5:00 PM</b></div>
+          <div><div class="small">Department</div><b>Roads & Engineering</b></div>
+        </div>
+        <button class="mobile-action" style="margin-top:12px" onclick="event.stopPropagation();fieldDetail()">Open ticket →</button>
+      </div>
+
+      <div class="card" style="margin-top:10px;opacity:.72">
+        <div style="display:flex;justify-content:space-between"><b>CGMS-2026-10471</b><span class="status progress">Scheduled</span></div>
+        <div class="small" style="margin-top:5px">Streetlight issue · Wagle Estate</div>
+      </div>
+      <div class="card" style="margin-top:10px;opacity:.72">
+        <div style="display:flex;justify-content:space-between"><b>CGMS-2026-10465</b><span class="status progress">Scheduled</span></div>
+        <div class="small" style="margin-top:5px">Drainage blockage · Kopri</div>
+      </div>
+    `);
+  };
+
+  window.fieldDetail = function(){
+    state.screen="detail";
+    state.fieldStep=1;
+    render();
+  };
+
+  window.goToFieldLocation = function(){
+    state.fieldStep=2;
+    state.caseStatus="Assigned to ground team";
+    render();
+  };
+
+  window.verifyFieldLocation = function(){
+    state.fieldStep=3;
+    state.caseStatus="Field visit in progress";
+    render();
+    notify("✓ Arrival and GPS location verified");
+  };
+
+  window.markFieldWork = function(note){
+    state.workCompleted=true;
+    state.workNote=note;
+    state.caseStatus="Work completed on site";
+    state.evidenceAdded=true;
+    render();
+    notify("✓ Work recorded and evidence attached");
+  };
+
+  window.captureFieldPhoto = function(){
+    state.evidenceAdded=true;
+    state.caseStatus="Evidence captured";
+    render();
+    notify("✓ Site photo attached with GPS + timestamp");
+  };
+
+  window.removeFieldPhoto = function(){
+    state.evidenceAdded=false;
+    render();
+    notify("Photo removed");
+  };
+
+  window.goFieldSubmit = function(){
+    if(!state.workCompleted){notify("Complete the field work first");return}
+    if(!state.evidenceAdded){notify("Add evidence first");return}
+    state.fieldStep=4;
+    render();
+  };
+
+  window.submitFieldReport = function(){
+    const el=document.getElementById("fieldComment");
+    if(el) state.fieldComment=el.value.trim();
+    if(!state.workCompleted){notify("Record the field work first");return}
+    if(!state.evidenceAdded){notify("Evidence is required");return}
+    state.verified=true;
+    state.caseStatus="Field Verified";
+    state.fieldStep=4;
+    state.persona=2;
+    state.screen="case";
+    render();
+    notify("✓ Field report submitted to Roads & Engineering");
+  };
+
+  window.fieldScreen = function(){
+    if(state.fieldStep===1) return mobile(`
+      <div class="small">FIELD TASK · 01</div>
+      <h2 style="margin:4px 0 4px">Review assignment</h2>
+      <div class="small">Check the ticket, then head to the reported location.</div>
+      ${fieldWorkflowHeader()}
+      <div class="card">
+        <span class="status high">HIGH PRIORITY</span>
+        <h3 style="margin:9px 0 3px">CGMS-2026-10482</h3>
+        <div class="small">Road damage / pothole</div>
+        <hr style="border:0;border-top:1px solid #eee;margin:12px 0">
+        <div class="small">Reported location</div><b>Near ZP School, Thane West</b>
+        <div class="small" style="margin-top:10px">Citizen description</div>
+        <div style="font-size:13px;line-height:1.45;margin-top:4px">Large pothole on the main road, dangerous for two-wheelers at night.</div>
+        <div class="grid g2" style="margin-top:12px">
+          <div><div class="small">Department</div><b>Roads & Engineering</b></div>
+          <div><div class="small">SLA</div><b>Today · 5 PM</b></div>
+        </div>
+      </div>
+      <button class="mobile-action" style="margin-top:12px" onclick="goToFieldLocation()">Go to location →</button>
+    `);
+
+    if(state.fieldStep===2) return mobile(`
+      <div class="small">FIELD TASK · 02</div>
+      <h2 style="margin:4px 0 4px">Visit location</h2>
+      <div class="small">Navigate, arrive and confirm your GPS position.</div>
+      ${fieldWorkflowHeader()}
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div><b>📍 ZP School, Thane West</b><div class="small">Reported location</div></div>
+          <span class="status progress">18 m away</span>
+        </div>
+        <div class="map" style="height:190px;margin-top:12px"><i class="pin p2"></i></div>
+        <button class="mobile-action" style="margin-top:10px" onclick="verifyFieldLocation()">✓ Confirm arrival</button>
+      </div>
+      <div class="small" style="margin-top:10px">GPS will be attached automatically to the field report.</div>
+    `);
+
+    if(state.fieldStep===3) return mobile(`
+      <div class="small">FIELD TASK · 03</div>
+      <h2 style="margin:4px 0 4px">Do the work & add evidence</h2>
+      <div class="small">Record what you found, what you did and attach a site photo.</div>
+      ${fieldWorkflowHeader()}
+      <div class="card">
+        <span class="status progress">ON SITE</span>
+        <h3 style="margin:9px 0 4px">Pothole inspection</h3>
+        <div class="small">Complete the field action and capture evidence in the same step.</div>
+
+        <div class="grid g2" style="margin-top:12px">
+          <button class="btn action-emphasis" onclick="markFieldWork('Site inspected; temporary barricading placed')">✓ Record work</button>
+          <button class="btn" onclick="captureFieldPhoto()">📷 Add photo</button>
+        </div>
+
+        <div class="card" style="margin-top:11px;background:#f7fbf9;border-color:#cde9dc">
+          <div style="display:flex;justify-content:space-between">
+            <b>${state.workCompleted?"✓ Work recorded":"○ Work not recorded"}</b>
+            <b>${state.evidenceAdded?"✓ Evidence attached":"○ No photo"}</b>
+          </div>
+          ${state.evidenceAdded?`<div class="photo" style="height:95px;margin-top:9px;background:linear-gradient(145deg,#64748b,#cbd5e1 50%,#475569)"></div><div class="small" style="margin-top:5px">GPS matched · 2:38 PM · 3.2 MB</div>`:""}
+        </div>
+
+        <label class="small" style="display:block;margin-top:12px"><b>Field note</b></label>
+        <textarea id="fieldComment" class="form-field" style="height:78px;margin-top:6px;resize:none" placeholder="What did you observe or fix?">${esc(state.fieldComment||"")}</textarea>
+
+        ${state.workCompleted && state.evidenceAdded?`<button class="mobile-action" style="margin-top:12px" onclick="goFieldSubmit()">Review & submit →</button>`:""}
+      </div>
+    `);
+
+    return mobile(`
+      <div class="small">FIELD TASK · 04</div>
+      <h2 style="margin:4px 0 4px">Submit for resolution</h2>
+      <div class="small">Send the completed field report to the department officer.</div>
+      ${fieldWorkflowHeader()}
+      <div class="card">
+        <div style="display:flex;justify-content:space-between"><b>Field report ready</b><span class="status done">Complete</span></div>
+        <hr style="border:0;border-top:1px solid #eee;margin:12px 0">
+        <div class="small">Ticket</div><b>CGMS-2026-10482</b>
+        <div class="small" style="margin-top:9px">Location</div><b>✓ GPS verified</b>
+        <div class="small" style="margin-top:9px">Work</div><b>✓ Recorded</b>
+        <div class="small" style="margin-top:9px">Evidence</div><b>✓ Site photo attached</b>
+        <div class="small" style="margin-top:9px">Field note</div><div>${esc(state.fieldComment||"Site inspected; temporary barricading placed.")}</div>
+      </div>
+      <button class="mobile-action" style="margin-top:12px" onclick="submitFieldReport()">Submit for resolution ✓</button>
+    `);
+  };
+
+  /* Ground Team contextual action mirrors the shortened workflow. */
+  const oldContext = window.contextualNext;
+  window.contextualNext = function(){
+    const p=state.persona, s=state.screen;
+    if(p===3){
+      if(s==="tasks") return `<div class="next-action"><div><b>Next: open the priority ticket</b><div class="small">Review the assignment before starting the field visit.</div></div><button class="btn primary" onclick="fieldDetail()">Open ticket →</button></div>`;
+      if(s==="detail"){
+        const actions={
+          1:["Go to location","Head to the reported site.","goToFieldLocation()"],
+          2:["Confirm arrival","Verify your GPS position at the site.","verifyFieldLocation()"],
+          3:["Do work + add evidence","Record the work and attach a photo.","markFieldWork('Site inspected; temporary barricading placed')"]
+        };
+        const a=actions[state.fieldStep]||actions[1];
+        return `<div class="next-action"><div><b>Next: ${a[0]}</b><div class="small">${a[1]}</div></div><button class="btn primary action-emphasis" onclick="${a[2]}">${a[0]} →</button></div>`;
+      }
+    }
+    return oldContext ? oldContext() : "";
+  };
+})();
+</script>
+
+<script id="assignment-interactions">
+(function(){
+  window.showDepartmentAssign = function(){
+    state.assignmentMode="department";
+    state.screen="assign";
+    render();
+  };
+  window.showFieldAssign = function(){
+    state.assignmentMode="field";
+    state.screen="assign";
+    render();
+  };
+  window.assignDepartment = function(dept){
+    state.assignedDepartment=dept;
+    state.assignmentMode="field";
+    render();
+    notify("✓ Department selected: "+dept);
+  };
+  window.assignFieldTeam = function(team){
+    state.assignedTeam=team;
+    state.assigned=true;
+    state.assignmentMode=null;
+    state.caseStatus="Assigned to field team";
+    state.persona=3;
+    state.screen="tasks";
+    render();
+    notify("✓ "+team+" assigned to CGMS-2026-10482");
+  };
+
+  const oldCase = window.caseScreen;
+  window.caseScreen = function(){
+    if(state.screen==="assign"){
+      const department = state.assignedDepartment || "Roads & Engineering";
+      if(state.assignmentMode==="department"){
+        return desktop(`
+          <div class="small">CONTROL ROOM · ROUTING</div>
+          <h2 style="margin:4px 0">Assign department</h2>
+          <div class="small">Select where the complaint should be routed. The selection is recorded in the case audit trail.</div>
+          <div class="card" style="margin-top:16px">
+            <div class="small">CASE</div><h3 style="margin:4px 0">CGMS-2026-10482 · Pothole</h3>
+            <div class="small">Near ZP School, Thane West · AI classification: Road infrastructure</div>
+          </div>
+          <div class="grid g3" style="margin-top:12px">
+            ${["Roads & Engineering","Water Supply","Solid Waste Management","Street Lighting","Health & Sanitation"].map((d,i)=>`
+              <div class="card selectable ${department===d?"selected":""}" onclick="assignDepartment('${d}')">
+                <div style="font-size:18px">${["🛣️","💧","♻️","💡","🏥"][i]}</div>
+                <b style="display:block;margin-top:7px">${d}</b>
+                <div class="small" style="margin-top:4px">${i===0?"Recommended by AI":"Available department"}</div>
+                ${department===d?`<div class="status done" style="margin-top:8px">Selected ✓</div>`:""}
+              </div>`).join("")}
+          </div>
+          <div class="next-action" style="margin-top:14px">
+            <div><b>Next: assign a field team</b><div class="small">After selecting the department, choose the team that will visit the location.</div></div>
+            <button class="btn primary" onclick="showFieldAssign()">Continue →</button>
+          </div>
+        `);
+      }
+
+      return desktop(`
+        <div class="small">CONTROL ROOM · DISPATCH</div>
+        <h2 style="margin:4px 0">Assign field team</h2>
+        <div class="small">Choose the available crew responsible for this ward and service type.</div>
+        <div class="card" style="margin-top:16px">
+          <div class="small">SELECTED DEPARTMENT</div>
+          <b>${department}</b>
+          <button class="btn" style="float:right" onclick="showDepartmentAssign()">Change</button>
+        </div>
+        <div class="grid g3" style="margin-top:12px">
+          ${[
+            ["Roads Crew · West 02","3 members · 1.2 km away","Available","🦺"],
+            ["Roads Crew · West 01","4 members · 3.8 km away","On another job","🦺"],
+            ["Emergency Works · Zone 3","2 members · 5.1 km away","Available","🚧"]
+          ].map((t,i)=>`
+            <div class="card selectable ${i===0?"selected":""}" onclick="assignFieldTeam('${t[0]}')">
+              <div style="font-size:20px">${t[3]}</div>
+              <b style="display:block;margin-top:7px">${t[0]}</b>
+              <div class="small" style="margin-top:5px">${t[1]}</div>
+              <span class="status ${i===1?"progress":"done"}" style="margin-top:8px">${t[2]}</span>
+            </div>`).join("")}
+        </div>
+        <div class="next-action" style="margin-top:14px">
+          <div><b>Dispatch selected crew</b><div class="small">The ground team will receive the ticket with location, SLA and citizen evidence.</div></div>
+          <button class="btn primary" onclick="assignFieldTeam('Roads Crew · West 02')">Assign & dispatch ✓</button>
+        </div>
+      `);
+    }
+    return oldCase ? oldCase() : "";
+  };
+})();
+</script>
+<style>
+.selectable{cursor:pointer;transition:.18s ease;border:1px solid #e7eaf0}
+.selectable:hover{transform:translateY(-1px);border-color:#b8b8ef}
+.selectable.selected{border-color:#6868dc;box-shadow:0 0 0 2px rgba(104,104,220,.12);background:#fafaff}
+</style>
+
+<style id="citizen-compact-mobile">
+@media (max-width: 900px) {
+  .citizen-compact {
+    padding-bottom: 18px !important;
+  }
+  .citizen-compact h2 {
+    font-size: 21px !important;
+    margin-bottom: 3px !important;
+  }
+  .citizen-compact .compact-desc {
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+  }
+  .citizen-compact .compact-label {
+    margin-top: 8px !important;
+    font-size: 11px !important;
+  }
+  .citizen-compact textarea {
+    height: 58px !important;
+    min-height: 58px !important;
+    padding: 9px !important;
+    font-size: 12px !important;
+  }
+  .citizen-compact select {
+    height: 38px !important;
+    padding: 0 10px !important;
+    font-size: 12px !important;
+  }
+  .citizen-compact .compact-upload {
+    min-height: 48px !important;
+    padding: 7px 10px !important;
+    display:flex !important;
+    align-items:center !important;
+    gap:9px !important;
+    text-align:left !important;
+  }
+  .citizen-compact .compact-map {
+    padding: 8px !important;
+  }
+  .citizen-compact .compact-map .map {
+    height: 76px !important;
+    margin-top: 7px !important;
+  }
+  .citizen-compact .compact-map-actions {
+    display:flex !important;
+    gap:6px !important;
+    margin-top:6px !important;
+  }
+  .citizen-compact .compact-map-actions .btn {
+    padding:7px 8px !important;
+    font-size:11px !important;
+  }
+  .citizen-compact .compact-secondary {
+    display:none !important;
+  }
+  .citizen-compact .mobile-action {
+    margin-top:9px !important;
+    padding:11px !important;
+    font-size:13px !important;
+  }
+}
+</style>
+<script id="citizen-compact-layout">
+(function(){
+  const originalCitizenReport = window.citizenReport;
+  window.citizenReport = function(){
+    if(state.complaintStep !== 1) return originalCitizenReport();
+
+    return `<div class="citizen-compact">
+      <div class="small">NEW GRIEVANCE · STEP 1 OF 2</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:3px 0 8px">
+        <h2>Report a problem</h2>
+        <button class="btn" style="padding:5px 8px" onclick="go(0,'home')">×</button>
+      </div>
+
+      <div style="display:flex;gap:4px;margin-bottom:9px">
+        <div style="flex:1">
+          <div style="height:4px;border-radius:4px;background:#6d5bd0"></div>
+          <div style="font-size:9px;color:#6d5bd0;margin-top:3px">1 Details</div>
+        </div>
+        <div style="flex:1">
+          <div style="height:4px;border-radius:4px;background:#e5e7eb"></div>
+          <div style="font-size:9px;color:#9aa3b2;margin-top:3px">2 Review & submit</div>
+        </div>
+      </div>
+
+      <div class="compact-desc">Add the issue, department, photo and location. That's it.</div>
+
+      <label class="small compact-label" style="display:block"><b>What happened?</b></label>
+      <textarea id="complaintText" style="width:100%;margin-top:4px;border:1px solid #dfe4ec;border-radius:10px;resize:none"
+        placeholder="Describe the problem...">${esc(state.citizenDescription || "There is a large pothole near the ZP School on the main road. It is dangerous for two-wheelers at night.")}</textarea>
+
+      <label class="small compact-label" style="display:block"><b>Department</b></label>
+      <select id="complaintDept" class="form-field" style="margin-top:4px">
+        ${["Roads & Engineering","Water Supply","Solid Waste Management","Street Lighting","Health & Sanitation"].map(d=>`<option ${d===state.citizenDept?"selected":""}>${d}</option>`).join("")}
+      </select>
+
+      <label class="small compact-label" style="display:block"><b>Photo & location</b></label>
+      <div class="card compact-map" style="margin-top:4px">
+        <div class="compact-upload" onclick="addCitizenPhoto()">
+          <span style="font-size:20px">📷</span>
+          <div>
+            <b>${state.citizenPhotoAdded?"Photo attached":"Add a photo"}</b>
+            <div class="small">${state.citizenPhotoAdded?"Tap to replace":"Required for this demo"}</div>
+          </div>
+          <span style="margin-left:auto">✓</span>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+          <div>
+            <b style="font-size:12px">📍 Near ZP School, Thane West</b>
+            <div class="small">GPS location detected</div>
+          </div>
+          <span class="status done" style="font-size:9px">GPS ready</span>
+        </div>
+
+        <div class="map compact-map" style="height:76px;margin-top:7px"><i class="pin p2"></i></div>
+
+        <div class="compact-map-actions">
+          <button class="btn" style="flex:1" onclick="useCitizenGPS()">⌖ Use GPS</button>
+          <button class="btn" style="flex:1" onclick="notify('Location search opened in demo')">Search location</button>
+        </div>
+      </div>
+
+      <button class="mobile-action" onclick="complaintNext()">Review complaint →</button>
+    </div>`;
+  };
+})();
+</script>
+
+<style id="citizen-balanced-layout">
+.mobile-bottom{display:none !important}
+
+@media (max-width:900px){
+  .mobile-shell{margin-top:10px !important;margin-bottom:10px !important}
+  .phone{min-height:760px !important}
+  .mobile-body{padding:15px 16px 18px !important}
+
+  .citizen-compact{
+    padding-bottom:12px !important;
+  }
+  .citizen-compact .compact-desc{
+    margin-bottom:9px !important;
+    line-height:1.4 !important;
+  }
+  .citizen-compact .compact-label{
+    margin-top:9px !important;
+  }
+  .citizen-compact textarea{
+    height:68px !important;
+    min-height:68px !important;
+    line-height:1.4 !important;
+  }
+  .citizen-compact .compact-upload{
+    min-height:54px !important;
+    padding:8px 10px !important;
+  }
+  .citizen-compact .compact-map{
+    padding:9px !important;
+  }
+  .citizen-compact .compact-map .map{
+    height:90px !important;
+    margin-top:8px !important;
+  }
+  .citizen-compact .compact-map-actions{
+    margin-top:7px !important;
+  }
+  .citizen-compact .mobile-action{
+    margin-top:11px !important;
+    padding:12px !important;
+  }
+}
+</style>
+
+<style id="assignment-modal-styles">
+.assignment-overlay{
+  position:fixed;inset:0;background:rgba(15,23,42,.42);backdrop-filter:blur(3px);
+  z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.assignment-modal{
+  width:min(680px,calc(100vw - 32px));max-height:min(720px,calc(100vh - 40px));
+  overflow:auto;background:#fff;border-radius:20px;box-shadow:0 24px 70px rgba(15,23,42,.24);
+  padding:22px;
+}
+.assignment-option{
+  border:1px solid #e5e7eb;border-radius:14px;padding:14px;cursor:pointer;
+  transition:.16s ease;background:#fff;
+}
+.assignment-option:hover{border-color:#a5a6e8;transform:translateY(-1px)}
+.assignment-option.selected{border-color:#625bd4;background:#f8f7ff;box-shadow:0 0 0 2px rgba(98,91,212,.10)}
+.assignment-radio{
+  width:18px;height:18px;border:2px solid #cbd0dc;border-radius:50%;display:inline-flex;
+  align-items:center;justify-content:center;flex:none;
+}
+.assignment-option.selected .assignment-radio{border-color:#625bd4}
+.assignment-option.selected .assignment-radio:after{content:"";width:8px;height:8px;border-radius:50%;background:#625bd4}
+@media(max-width:900px){
+  .assignment-overlay{align-items:flex-end;padding:10px}
+  .assignment-modal{width:100%;max-height:88vh;border-radius:20px 20px 14px 14px;padding:17px}
+}
+</style>
+<script id="real-assignment-modals">
+(function(){
+
+  function removeModal(){
+    const el=document.getElementById("assignmentOverlay");
+    if(el) el.remove();
+  }
+
+  window.closeAssignmentModal=function(){
+    removeModal();
+  };
+
+  window.openAssignmentModal=function(mode){
+    removeModal();
+    const isDepartment=mode==="department";
+    const isOfficer=mode==="field";
+    const departments=[
+      ["Roads & Engineering","AI match · 96%","382 open cases","Recommended"],
+      ["Water Supply","Service mismatch · 14%","241 open cases",""],
+      ["Solid Waste Management","Service mismatch · 8%","154 open cases",""],
+      ["Street Lighting","Service mismatch · 6%","176 open cases",""],
+      ["Health & Sanitation","Service mismatch · 4%","198 open cases",""]
+    ];
+    const teams=[
+      ["Roads Crew · West 02","3 members · 1.2 km away","Available","Can start now","Recommended"],
+      ["Roads Crew · West 01","4 members · 3.8 km away","Busy","1 active ticket",""],
+      ["Emergency Works · Zone 3","2 members · 5.1 km away","Available","2 tickets in queue",""],
+      ["Roads Crew · Central 01","3 members · 6.4 km away","Available","Can start in 20 min",""]
+    ];
+
+    state.assignmentSelection = isDepartment
+      ? (state.assignedDepartment || "Roads & Engineering")
+      : (state.assignedTeam || "Roads Crew · West 02");
+
+    const options=isDepartment?departments:teams;
+    const title=isDepartment?"Assign department":"Assign field team";
+    const eyebrow=isDepartment?"CONTROL ROOM · ROUTING":"DEPARTMENT OFFICER · FIELD DISPATCH";
+    const description=isDepartment
+      ?"Review the AI recommendation and select the department that should own this grievance."
+      :"Choose the field crew that should handle this ticket. Availability, distance and current workload are shown.";
+
+    const overlay=document.createElement("div");
+    overlay.id="assignmentOverlay";
+    overlay.className="assignment-overlay";
+    overlay.innerHTML=`
+      <div class="assignment-modal" onclick="event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;gap:15px;align-items:flex-start">
+          <div>
+            <div class="small">${eyebrow}</div>
+            <h2 style="margin:4px 0 5px">${title}</h2>
+            <div class="small" style="line-height:1.45">${description}</div>
+          </div>
+          <button class="btn" onclick="closeAssignmentModal()" style="padding:6px 10px">×</button>
+        </div>
+
+        <div class="card" style="margin-top:15px;background:#f8fafc">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div class="small">CASE</div>
+              <b>CGMS-2026-10482 · Pothole near ZP School</b>
+            </div>
+            <span class="status high">HIGH</span>
+          </div>
+          <div class="small" style="margin-top:6px">
+            Thane West · SLA today 5:00 PM
+          </div>
+        </div>
+
+        <div style="margin-top:16px">
+          <div class="small" style="margin-bottom:8px"><b>${isDepartment?"AVAILABLE DEPARTMENTS":"AVAILABLE FIELD TEAMS"}</b></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+            ${options.map((o,i)=>{
+              const selected=state.assignmentSelection===o[0];
+              return `<div class="assignment-option ${selected?"selected":""}" onclick="selectAssignment('${o[0].replace(/'/g,"\\'")}','${mode}')">
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                  <span class="assignment-radio"></span>
+                  <div style="flex:1">
+                    <div style="display:flex;justify-content:space-between;gap:7px">
+                      <b>${o[0]}</b>
+                      ${o[4]?`<span class="status done" style="font-size:9px">${o[4]}</span>`:""}
+                    </div>
+                    <div class="small" style="margin-top:4px">${o[1]}</div>
+                    <div class="small" style="margin-top:3px">${o[2]} · ${o[3]}</div>
+                  </div>
+                </div>
+              </div>`;
+            }).join("")}
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:13px;background:#fafafa">
+          <div class="small">SELECTED</div>
+          <b id="assignmentSelectedLabel">${state.assignmentSelection}</b>
+          <div class="small" style="margin-top:4px">
+            ${isDepartment
+              ?"The case owner will change to the selected department."
+              :"The selected crew will receive the case, location, SLA and citizen evidence."}
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:15px">
+          <button class="btn" onclick="closeAssignmentModal()">Cancel</button>
+          <button class="btn primary" onclick="confirmAssignment('${mode}')">
+            ${isDepartment?"Assign department":"Confirm assignment"} ✓
+          </button>
+        </div>
+      </div>`;
+
+    overlay.onclick=closeAssignmentModal;
+    document.body.appendChild(overlay);
+  };
+
+  window.selectAssignment=function(value,mode){
+    state.assignmentSelection=value;
+    const modal=document.getElementById("assignmentOverlay");
+    if(!modal) return;
+    const options=modal.querySelectorAll(".assignment-option");
+    options.forEach(el=>{
+      const b=el.querySelector("b");
+      el.classList.toggle("selected",b && b.textContent.trim()===value);
+    });
+    const label=document.getElementById("assignmentSelectedLabel");
+    if(label) label.textContent=value;
+  };
+
+  window.confirmAssignment=function(mode){
+    const value=state.assignmentSelection;
+    if(!value){notify("Select an assignment first");return}
+
+    removeModal();
+
+    if(mode==="department"){
+      state.assignedDepartment=value;
+      state.assigned=true;
+      state.caseStatus="Department assigned";
+      state.persona=2;
+      state.screen="case";
+      render();
+      notify("✓ Assigned to "+value+" · Department Officer notified");
+    }else{
+      state.assignedTeam=value;
+      state.assigned=true;
+      state.caseStatus="Field Visit";
+      state.persona=3;
+      state.screen="tasks";
+      render();
+      notify("✓ "+value+" assigned to CGMS-2026-10482");
+    }
+  };
+
+  /* These are the actions used by the existing Control Room and Officer CTAs. */
+  window.assignFromControl=function(){
+    openAssignmentModal("department");
+  };
+
+  window.assignFieldFromOfficer=function(){
+    openAssignmentModal("field");
+  };
+
+  /* Keep older buttons/guide actions working too. */
+  window.showDepartmentAssign=function(){
+    openAssignmentModal("department");
+  };
+  window.showFieldAssign=function(){
+    openAssignmentModal("field");
+  };
+})();
+</script>
+
+<style id="ground-team-ux-v2">
+.field-progress{display:flex;gap:6px;margin:10px 0 14px}.field-progress .fp{flex:1}.field-progress .line{height:4px;border-radius:9px;background:#e6e9ef}.field-progress .line.active,.field-progress .line.done{background:#625bd4}.field-progress .lbl{font-size:10px;color:#8992a2;margin-top:5px;text-align:center}.field-progress .lbl.active{color:#4f46a5;font-weight:800}
+.field-hero{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:15px}.field-hero .ticket-id{font-size:11px;color:#6d28d9;font-weight:800;letter-spacing:.04em}.field-kv{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.field-kv>div{background:#f8f9fb;border-radius:11px;padding:9px}.field-kv .small{margin-bottom:2px}.field-status{display:inline-flex;align-items:center;gap:6px;padding:5px 8px;border-radius:999px;background:#eefbf5;color:#08734f;font-size:10px;font-weight:800}.field-choice{border:1px solid #e2e5eb;background:#fff;border-radius:12px;padding:11px;text-align:left;width:100%;cursor:pointer}.field-choice.selected{border-color:#625bd4;background:#f7f6ff;box-shadow:0 0 0 2px #625bd41a}.field-choice b{font-size:12px}.field-choice .small{margin-top:3px}.field-sticky{position:sticky;bottom:0;background:linear-gradient(transparent,#f7f8fb 18%);padding-top:15px;margin-top:4px}.field-meta{display:flex;justify-content:space-between;gap:8px;align-items:center}.field-photo-mini{height:105px;border-radius:12px;background:linear-gradient(145deg,#64748b,#cbd5e1 50%,#475569);position:relative;overflow:hidden}.field-photo-mini:after{content:'SITE PHOTO';position:absolute;right:9px;bottom:8px;color:#fff;font-size:9px;font-weight:800;letter-spacing:1px}.field-complete{border:1px solid #cde9dc;background:#f3fbf7;border-radius:12px;padding:11px}.field-alert{border:1px solid #fed7aa;background:#fff8ef;border-radius:12px;padding:11px;color:#9a4e08}
+</style>
+<script id="ground-team-ux-v2-js">
+(function(){
+  const TEAM=()=>state.assignedTeam||"Roads Crew · West 02";
+  const resetGT=()=>{
+    state.fieldStep=1; state.fieldArrived=false; state.workCompleted=false;
+    state.workNote=""; state.fieldComment=""; state.evidenceAdded=false;
+  };
+  window.fieldDetail=function(){
+    state.screen="detail";
+    if(!state.fieldStep) resetGT();
+    render();
+  };
+  window.goToFieldLocation=function(){
+    state.fieldStep=2; state.caseStatus="Visit in progress"; render();
+    notify("Visit started · Navigate to the reported location");
+  };
+  window.verifyFieldLocation=function(){
+    state.fieldArrived=true; state.caseStatus="On site"; render();
+    notify("✓ Location confirmed · GPS captured");
+  };
+  window.markFieldWork=function(note){
+    state.workCompleted=true; state.workNote=note; state.caseStatus="Work recorded"; render();
+    notify("✓ Field work recorded");
+  };
+  window.captureFieldPhoto=function(){
+    state.evidenceAdded=true; state.caseStatus="Evidence captured"; render();
+    notify("✓ Photo attached · GPS + timestamp added");
+  };
+  window.removeFieldPhoto=function(){state.evidenceAdded=false;render();notify("Photo removed")};
+  window.goFieldSubmit=function(){
+    const el=document.getElementById("fieldComment"); if(el) state.fieldComment=el.value.trim();
+    if(!state.workCompleted){notify("Choose the field work outcome first");return}
+    if(!state.evidenceAdded){notify("Add at least one site photo");return}
+    state.fieldStep=4; render();
+  };
+  window.submitFieldReport=function(){
+    const el=document.getElementById("fieldComment"); if(el) state.fieldComment=el.value.trim();
+    if(!state.workCompleted){notify("Choose the field work outcome first");return}
+    if(!state.evidenceAdded){notify("Add at least one site photo");return}
+    state.verified=true; state.caseStatus="Field Report Submitted"; state.fieldStep=4;
+    state.persona=2; state.screen="case"; render();
+    notify("✓ Field report submitted · Department Officer notified");
+  };
+  window.fieldOutcome=function(note){markFieldWork(note)};
+
+  function progress(active){
+    const labels=["Review","Visit","Work + evidence","Submit"];
+    return `<div class="field-progress">${labels.map((x,i)=>{
+      const n=i+1, cls=active===n?'active':active>n?'done':'';
+      return `<div class="fp"><div class="line ${cls}"></div><div class="lbl ${cls}">${active>n?'✓ ':''}${x}</div></div>`
+    }).join('')}</div>`;
+  }
+  function ticketCard(){
+    return `<div class="field-hero">
+      <div class="field-meta"><div class="ticket-id">CGMS-2026-10482</div><span class="status high">HIGH · SLA 5:00 PM</span></div>
+      <h3 style="margin:9px 0 3px">Pothole near ZP School</h3>
+      <div class="small">Road damage · Thane West</div>
+      <div class="field-kv">
+        <div><div class="small">Assigned team</div><b>${esc(TEAM())}</b></div>
+        <div><div class="small">Priority</div><b>High · 2h remaining</b></div>
+      </div>
+    </div>`;
+  }
+  window.fieldApp=function(){
+    if(state.screen==="detail") return fieldDetailScreen();
+    return mobile(`
+      <div class="small">GROUND OPERATIONS</div>
+      <div style="display:flex;justify-content:space-between;align-items:end">
+        <div><h2 style="margin:4px 0 3px">Today's work</h2><div class="small">${state.assignedTeam?esc(state.assignedTeam):'Roads Crew · West 02'} · 3 assigned</div></div>
+        <span class="field-status">● 1 priority</span>
+      </div>
+      <div class="card action-emphasis" style="margin-top:14px" onclick="fieldDetail()">
+        <div class="field-meta"><span class="status high">HIGH PRIORITY</span><span class="small">Due 5:00 PM</span></div>
+        <h3 style="margin:10px 0 3px">CGMS-2026-10482</h3>
+        <div class="small">Pothole · Near ZP School, Thane West</div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap"><span class="chip">Roads & Engineering</span><span class="chip">${esc(TEAM())}</span></div>
+        <button class="mobile-action" style="margin-top:13px" onclick="event.stopPropagation();fieldDetail()">Open priority ticket →</button>
+      </div>
+      <div class="small" style="margin:18px 2px 8px">Later today</div>
+      <div class="card"><div class="field-meta"><b>CGMS-2026-10471</b><span class="status progress">Scheduled</span></div><div class="small" style="margin-top:5px">Streetlight issue · Wagle Estate</div></div>
+      <div class="card" style="margin-top:9px"><div class="field-meta"><b>CGMS-2026-10465</b><span class="status progress">Scheduled</span></div><div class="small" style="margin-top:5px">Drainage blockage · Kopri</div></div>
+      <div class="card" style="margin-top:12px"><div class="field-meta"><b>Route progress</b><span class="small">0 / 3 completed</span></div><div class="bar" style="margin-top:9px"><i style="width:${state.verified?33:0}%"></i></div><div class="small" style="margin-top:7px">Complete the priority visit first.</div></div>
+    `);
+  };
+
+  function fieldDetailScreen(){
+    if(!state.fieldStep) resetGT();
+    if(state.fieldStep===1) return mobile(`
+      <div class="small">FIELD TASK · REVIEW</div><h2 style="margin:4px 0 3px">Before you leave</h2><div class="small">One quick check, then start the visit.</div>
+      ${progress(1)}${ticketCard()}
+      <div class="card" style="margin-top:11px"><b>What the citizen reported</b><div style="font-size:13px;line-height:1.5;margin-top:6px">Large pothole on the main road, dangerous for two-wheelers at night.</div><div class="small" style="margin-top:10px">Reported pin · Near ZP School, Thane West</div></div>
+      <div class="field-sticky"><button class="mobile-action" onclick="goToFieldLocation()">Start visit & navigate →</button></div>
+    `);
+
+    if(state.fieldStep===2) return mobile(`
+      <div class="small">FIELD TASK · VISIT</div><h2 style="margin:4px 0 3px">Get to the site</h2><div class="small">Navigate first. Confirm arrival only when you are physically there.</div>
+      ${progress(2)}${ticketCard()}
+      <div class="card" style="margin-top:11px">
+        <div class="field-meta"><div><b>📍 Reported location</b><div class="small">Near ZP School, Thane West</div></div><span class="status progress">18 m away</span></div>
+        <div class="map" style="height:170px;margin-top:11px"><i class="pin p2"></i></div>
+        ${state.fieldArrived?`<div class="field-complete" style="margin-top:10px"><b>✓ You are at the reported location</b><div class="small" style="margin-top:3px">GPS captured · within 18 m of citizen pin</div></div><button class="mobile-action" style="margin-top:10px" onclick="state.fieldStep=3;state.caseStatus='On site';render()">Start field work →</button>`:`<div class="grid g2" style="margin-top:10px"><button class="btn" onclick="notify('Navigation opened in demo')">⌖ Navigate</button><button class="btn primary" onclick="verifyFieldLocation()">✓ I am here</button></div>`}
+      </div>
+    `);
+
+    if(state.fieldStep===3) return mobile(`
+      <div class="small">FIELD TASK · ON SITE</div><h2 style="margin:4px 0 3px">Do the work & capture proof</h2><div class="small">Record the outcome, add a site photo, then review.</div>
+      ${progress(3)}${ticketCard()}
+      <div class="card" style="margin-top:11px">
+        <div class="field-status">● ON SITE · GPS verified</div>
+        <div style="margin-top:12px"><b>What did you do?</b><div class="small" style="margin-top:3px">Choose the outcome that best describes this visit.</div></div>
+        <div style="display:grid;gap:7px;margin-top:9px">
+          <button class="field-choice ${state.workNote==='Work completed on site'?'selected':''}" onclick="fieldOutcome('Work completed on site')"><b>${state.workNote==='Work completed on site'?'●':'○'} Work completed on site</b><div class="small">Issue fixed during this visit</div></button>
+          <button class="field-choice ${state.workNote==='Temporary safety action'?'selected':''}" onclick="fieldOutcome('Temporary safety action')"><b>${state.workNote==='Temporary safety action'?'●':'○'} Temporary safety action</b><div class="small">Barricading / immediate safety measure</div></button>
+          <button class="field-choice ${state.workNote==='Inspection only'?'selected':''}" onclick="fieldOutcome('Inspection only')"><b>${state.workNote==='Inspection only'?'●':'○'} Inspection only</b><div class="small">Issue needs another crew or follow-up</div></button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:10px">
+        <div class="field-meta"><div><b>Site evidence</b><div class="small">Photo is automatically GPS + time stamped</div></div>${state.evidenceAdded?'<span class="field-status">✓ Attached</span>':''}</div>
+        ${state.evidenceAdded?`<div class="field-photo-mini" style="margin-top:10px"></div><div class="small" style="margin-top:6px">Captured 2:38 PM · GPS match 18 m · 3.2 MB</div><div class="grid g2" style="margin-top:8px"><button class="btn" onclick="captureFieldPhoto()">＋ Retake</button><button class="btn" onclick="removeFieldPhoto()">Remove</button></div>`:`<button class="btn action-emphasis" style="width:100%;margin-top:10px" onclick="captureFieldPhoto()">📷 Capture site photo</button>`}
+        <label class="small" style="display:block;margin-top:12px"><b>Optional field note</b></label>
+        <textarea id="fieldComment" class="form-field" style="height:64px;margin-top:5px;resize:none" placeholder="Add a short note for the officer...">${esc(state.fieldComment||'')}</textarea>
+      </div>
+      <div class="field-sticky"><button class="mobile-action" onclick="goFieldSubmit()" ${state.workCompleted&&state.evidenceAdded?'':'style="opacity:.48"'}>Review report →</button><div class="small" style="text-align:center;margin-top:6px">${!state.workCompleted?'Select a work outcome':!state.evidenceAdded?'Add one site photo':'Ready for review'}</div></div>
+    `);
+
+    return mobile(`
+      <div class="small">FIELD TASK · FINAL CHECK</div><h2 style="margin:4px 0 3px">Review field report</h2><div class="small">Check the record before sending it back to the department officer.</div>
+      ${progress(4)}
+      <div class="field-complete"><b>Ready to submit</b><div class="small" style="margin-top:3px">All required field information is captured.</div></div>
+      <div class="card" style="margin-top:11px">
+        <div class="field-meta"><b>CGMS-2026-10482</b><span class="status done">Complete</span></div>
+        <div class="field-kv">
+          <div><div class="small">Arrival</div><b>✓ GPS verified</b></div>
+          <div><div class="small">Work</div><b>✓ ${esc(state.workNote)}</b></div>
+        </div>
+        <div style="margin-top:11px"><div class="small">Evidence</div><b>✓ 1 GPS-tagged site photo</b></div>
+        <div style="margin-top:11px"><div class="small">Field note</div><div style="font-size:13px;line-height:1.45">${esc(state.fieldComment||'No additional note added.')}</div></div>
+      </div>
+      <div class="card" style="margin-top:10px"><div class="small">After submission</div><b>Department Officer will review the field report.</b><div class="small" style="margin-top:4px">The citizen remains informed through the case timeline.</div></div>
+      <div class="field-sticky"><button class="mobile-action" onclick="submitFieldReport()">Submit for resolution ✓</button><button class="btn" style="width:100%;margin-top:8px" onclick="state.fieldStep=3;render()">← Edit field report</button></div>
+    `);
+  }
+
+  /* Make the demo guide match the actual field decision sequence. */
+  const priorContext=window.contextualNext;
+  window.contextualNext=function(){
+    if(state.persona===3){
+      if(state.screen==='tasks') return `<div class="next-action"><div><b>Next: open the priority ticket</b><div class="small">Review the assignment and start the visit.</div></div><button class="btn primary" onclick="fieldDetail()">Open ticket →</button></div>`;
+      if(state.screen==='detail'){
+        let title,desc,action,label;
+        if(state.fieldStep===1){title='Start the site visit';desc='Review the ticket, then navigate to the reported location.';action='goToFieldLocation()';label='Start visit';}
+        else if(state.fieldStep===2 && !state.fieldArrived){title='Confirm arrival when you reach site';desc='Navigate to the pin, then capture your GPS position.';action='verifyFieldLocation()';label='I am here';}
+        else if(state.fieldStep===2){title='Begin field work';desc='You are on site. Record the outcome and capture proof.';action="state.fieldStep=3;render()";label='Start work';}
+        else if(state.fieldStep===3 && !state.workCompleted){title='Record the field outcome';desc='Choose what happened during the visit.';action="fieldOutcome('Work completed on site')";label='Record work';}
+        else if(state.fieldStep===3 && !state.evidenceAdded){title='Capture site evidence';desc='Attach at least one GPS-tagged photo.';action='captureFieldPhoto()';label='Add photo';}
+        else if(state.fieldStep===3){title='Review the field report';desc='Check the work, photo and note before submitting.';action='goFieldSubmit()';label='Review report';}
+        else {title='Submit the field report';desc='Send the completed visit back to the department officer.';action='submitFieldReport()';label='Submit';}
+        return `<div class="next-action"><div><b>Next: ${title}</b><div class="small">${desc}</div></div><button class="btn primary action-emphasis" onclick="${action}">${label} →</button></div>`;
+      }
+    }
+    return priorContext?priorContext():'';
+  };
+})();
+</script>
